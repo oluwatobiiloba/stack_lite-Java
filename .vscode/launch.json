@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-StackliteCloneApplication<stacklite_clone>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.stacklite.dev.stacklite_clone.StackliteCloneApplication",
+      "projectName": "stacklite_clone",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
