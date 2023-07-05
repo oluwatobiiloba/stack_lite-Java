@@ -1,4 +1,4 @@
-package com.stacklite.dev.stacklite_clone;
+package com.stacklite.dev.stacklite_clone.Model;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
