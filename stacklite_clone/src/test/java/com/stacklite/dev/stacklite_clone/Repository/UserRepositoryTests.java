@@ -31,11 +31,11 @@ public class UserRepositoryTests {
         User user = new User();
         user.setEmail("test12345@gmail.com");
         user.setPassword("test202020");
-        user.setFirst_name("Ravi");
-        user.setLast_name("Kumar");
+        user.setFirstName("Ravi");
+        user.setLastName("Kumar");
         user.setUsername("tetsingJava");
-        user.setIs_verified(false);
-        user.setPhonenumber(810223455);
+        user.setIsVerified(false);
+        user.setPhoneNumber((long) 810223455);
         user.setRole(2);
         // Date date = new Date(0);
 
