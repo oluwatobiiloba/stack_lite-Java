@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.annotation.Rollback;
 
 import com.stacklite.dev.stacklite_clone.Model.User;
-import com.stacklite.dev.stacklite_clone.Repositories.UserRepository;
+import com.stacklite.dev.stacklite_clone.Repositories.Users;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
@@ -24,7 +24,7 @@ public class UserRepositoryTests {
     private TestEntityManager entityManager;
 
     @Autowired
-    private UserRepository userRepo;
+    private Users userRepo;
 
     @Test
     public void testCreateUser() {
