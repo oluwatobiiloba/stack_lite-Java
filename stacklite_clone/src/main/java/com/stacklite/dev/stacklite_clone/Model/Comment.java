@@ -1,7 +1,5 @@
 package com.stacklite.dev.stacklite_clone.Model;
 
-import java.util.UUID;
-
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 

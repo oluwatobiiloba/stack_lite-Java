@@ -2,8 +2,6 @@ package com.stacklite.dev.stacklite_clone.Repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.sql.Date;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
