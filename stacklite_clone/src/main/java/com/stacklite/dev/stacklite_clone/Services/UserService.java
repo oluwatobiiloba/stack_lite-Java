@@ -7,14 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.stacklite.dev.stacklite_clone.Model.User;
-import com.stacklite.dev.stacklite_clone.Repositories.Users;
+import com.stacklite.dev.stacklite_clone.Repositories.UsersRepo;
 import com.stacklite.dev.stacklite_clone.Dto.UserProfileUpdateDto;
 import com.stacklite.dev.stacklite_clone.Handlers.NotFoundException;
 
 @Service
 public class UserService {
     @Autowired
-    private Users usersRepo;
+    private UsersRepo usersRepo;
 
     public List<User> allUsers() {
         return usersRepo.findAll();

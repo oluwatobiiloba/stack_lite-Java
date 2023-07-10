@@ -7,6 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.stacklite.dev.stacklite_clone.Model.Movie;
 
-public interface MovieRepository extends MongoRepository<Movie, ObjectId> {
+public interface MovieRepositoryRepo extends MongoRepository<Movie, ObjectId> {
     Optional<Movie> findMovieByImdbId(String imdbId);
 }

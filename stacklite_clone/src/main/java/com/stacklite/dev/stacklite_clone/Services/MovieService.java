@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.stacklite.dev.stacklite_clone.Model.Movie;
-import com.stacklite.dev.stacklite_clone.Repositories.MovieRepository;
+import com.stacklite.dev.stacklite_clone.Repositories.MovieRepositoryRepo;
 
 @Service
 public class MovieService {
     @Autowired
-    private MovieRepository movieRepository;
+    private MovieRepositoryRepo movieRepository;
 
     public List<Movie> allMovies() {
         return movieRepository.findAll();

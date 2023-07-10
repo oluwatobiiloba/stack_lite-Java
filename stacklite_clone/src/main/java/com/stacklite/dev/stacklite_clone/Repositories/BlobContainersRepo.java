@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.stacklite.dev.stacklite_clone.Model.BlobContainer;
 
-public interface BlobContainers extends JpaRepository<BlobContainer, Integer> {
+public interface BlobContainersRepo extends JpaRepository<BlobContainer, Integer> {
 
 }

@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.stacklite.dev.stacklite_clone.Model.VerifyUser;
 
-public interface VerifyUsers extends JpaRepository<VerifyUser, Integer> {
+public interface VerifyUsersRepo extends JpaRepository<VerifyUser, Integer> {
 
 }
