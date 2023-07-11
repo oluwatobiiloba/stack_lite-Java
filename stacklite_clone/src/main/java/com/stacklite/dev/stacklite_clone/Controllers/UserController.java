@@ -1,6 +1,7 @@
 package com.stacklite.dev.stacklite_clone.Controllers;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.stacklite.dev.stacklite_clone.Model.User;
@@ -18,6 +20,7 @@ import com.stacklite.dev.stacklite_clone.Services.UserService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
+import jakarta.websocket.server.PathParam;
 
 import com.stacklite.dev.stacklite_clone.Dto.UserProfileUpdateDto;
 import com.stacklite.dev.stacklite_clone.Handlers.NotFoundException;
@@ -30,8 +33,9 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/allusers")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return new ResponseEntity<List<User>>(userService.allUsers(), HttpStatus.OK);
+    public ResponseEntity<Optional<List<User>>> getAllUsers(
+            @RequestParam(required = false) Map<String, String> queryParameters) {
+        return new ResponseEntity<Optional<List<User>>>(userService.allUsers(queryParameters), HttpStatus.OK);
     }
 
     @GetMapping("/{Id}/profile")

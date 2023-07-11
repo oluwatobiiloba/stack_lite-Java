@@ -1,8 +1,11 @@
 package com.stacklite.dev.stacklite_clone.Services;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,12 +20,27 @@ public class UserService {
     @Autowired
     private UsersRepo usersRepo;
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
     // @Value("${DB_NAME}")
     // String dbPasword;
 
-    public List<User> allUsers() {
-        return usersRepo.findAll();
+    public Optional<List<User>> allUsers(Map<String, String> queryParameters) {
+        if (queryParameters.containsKey("email")) {
+            String email = queryParameters.get("email");
+            logger.info("email is {}", email);
+            return usersRepo.findByEmail(email);
+        } else {
+            List<User> users = usersRepo.findAll();
+            Optional<List<User>> optionalUsers = Optional.ofNullable(users);
+            return optionalUsers;
+        }
+
     }
+
+    // public List<User> findUsers(String queryString) {
+
+    // }
 
     public Optional<User> getUser(Integer Id) {
         return usersRepo.findById(Id);
