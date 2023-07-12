@@ -3,6 +3,7 @@ package com.stacklite.dev.stacklite_clone.Model;
 import java.sql.Date;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.stacklite.dev.stacklite_clone.Utils.PasswordUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -113,6 +113,8 @@ public class User {
         this.createdAt = new Date(java.lang.System.currentTimeMillis());
         this.updatedAt = new Date(java.lang.System.currentTimeMillis());
         this.isVerified = false;
+        this.role = 1;
+        this.password = PasswordUtils.hashPassword(this.password);
     }
 
     @Override

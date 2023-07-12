@@ -16,7 +16,7 @@ public interface UsersRepo extends JpaRepository<User, Integer> {
 
     Optional<List<User>> findByStack(String stack);
 
-    Optional<List<User>> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     Optional<List<User>> findByUsernameLike(String likePattern);
 }
