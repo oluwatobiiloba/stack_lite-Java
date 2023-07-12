@@ -20,8 +20,6 @@ import com.stacklite.dev.stacklite_clone.Services.UserService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
-import jakarta.websocket.server.PathParam;
-
 import com.stacklite.dev.stacklite_clone.Dto.UserProfileUpdateDto;
 import com.stacklite.dev.stacklite_clone.Handlers.NotFoundException;
 //import com.stacklite.dev.stacklite_clone.Repositories.UserRepository;
@@ -32,7 +30,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/allusers")
+    @GetMapping("/admin/allusers")
     public ResponseEntity<Optional<List<User>>> getAllUsers(
             @RequestParam(required = false) Map<String, String> queryParameters) {
         return new ResponseEntity<Optional<List<User>>>(userService.allUsers(queryParameters), HttpStatus.OK);
