@@ -1,5 +1,7 @@
 package com.stacklite.dev.stacklite_clone.Services;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -14,16 +16,21 @@ import com.stacklite.dev.stacklite_clone.Dto.UserAuthDto;
 import com.stacklite.dev.stacklite_clone.Dto.UserRegistrationDto;
 import com.stacklite.dev.stacklite_clone.Handlers.UnauthorizedException;
 import com.stacklite.dev.stacklite_clone.Model.User;
+import com.stacklite.dev.stacklite_clone.Utils.AzureMailer;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 @Service
 public class AuthService {
 
-    // @Value("${SALT_ROUNDS}")
-    // String salt;
+    @Autowired
+    UserService userService;
 
     @Autowired
+    private EmailTemplateService azureMailer;
 
-    UserService userService;
+    Dotenv dotenv = Dotenv.load();
+    private String liveBaseUrl = dotenv.get("LIVE_URL_BASE");
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -53,6 +60,20 @@ public class AuthService {
     }
 
     public Optional<User> register(UserRegistrationDto userRegDto) {
-        return userService.createUser(userRegDto);
+        Optional<User> createdUser = userService.createUser(userRegDto);
+
+        if (createdUser.isPresent()) {
+            Map<String, String> constants = new HashMap<>();
+
+            String username = userRegDto.getUsername();
+            String subject = "Welcome to Stacklite";
+            String email = userRegDto.getEmail();
+            String verification_link = liveBaseUrl + "/api/v1/users/verify-email?token=${verification_token}";
+            constants.put("username", username);
+            constants.put("verification_link", verification_link);
+
+            azureMailer.sendEmailWithTemplate(1, constants, email, subject);
+        }
+        return createdUser;
     }
 }

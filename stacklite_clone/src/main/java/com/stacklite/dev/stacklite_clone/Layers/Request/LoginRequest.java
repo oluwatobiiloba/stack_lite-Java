@@ -1,4 +1,4 @@
-package com.stacklite.dev.stacklite_clone.Dto;
+package com.stacklite.dev.stacklite_clone.Layers.Request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserAuthDto {
+public class LoginRequest {
 
     @NotBlank(message = "Email is required")
     private String email;

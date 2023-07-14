@@ -1,8 +1,14 @@
 package com.stacklite.dev.stacklite_clone.Dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserProfileUpdateDto {
 
     // @NotBlank(message = "First name is required")

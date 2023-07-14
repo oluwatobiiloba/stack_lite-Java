@@ -34,7 +34,7 @@ public class UserRepositoryTests {
         user.setUsername("tetsingJava");
         user.setIsVerified(false);
         user.setPhoneNumber((long) 810223455);
-        user.setRole(2);
+        // user.setRole(2);
         // Date date = new Date(0);
 
         // user.setCreatedAt(date);

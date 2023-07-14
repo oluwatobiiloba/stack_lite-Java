@@ -1,5 +1,6 @@
 package com.stacklite.dev.stacklite_clone.Controllers;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,8 +18,12 @@ import com.stacklite.dev.stacklite_clone.Dto.UserAuthDto;
 import com.stacklite.dev.stacklite_clone.Dto.UserRegistrationDto;
 import com.stacklite.dev.stacklite_clone.Handlers.NotFoundException;
 import com.stacklite.dev.stacklite_clone.Handlers.UnauthorizedException;
+import com.stacklite.dev.stacklite_clone.Layers.Response.ErrorResponse;
+import com.stacklite.dev.stacklite_clone.Layers.Response.Response;
 import com.stacklite.dev.stacklite_clone.Model.User;
 import com.stacklite.dev.stacklite_clone.Services.AuthService;
+import com.stacklite.dev.stacklite_clone.Utils.JwtTokenUtil;
+import com.stacklite.dev.stacklite_clone.Utils.ResponseUtil;
 
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
@@ -29,10 +34,27 @@ public class AuthController {
     @Autowired
     private AuthService authservice;
 
+    @Autowired
+    private ResponseUtil responseUtil;
+
+    @Autowired
+    private JwtTokenUtil jwtUtil;
+
+    String token;
+
     @PostMapping("/login")
-    public ResponseEntity<Optional<User>> authenticateEmailPassword(@Valid @RequestBody UserAuthDto userAuthDto)
+    public ResponseEntity<Response<Map<String, Object>>> authenticateEmailPassword(
+            @Valid @RequestBody UserAuthDto userAuthDto)
             throws Exception {
-        return new ResponseEntity<Optional<User>>(authservice.authenticate(userAuthDto), HttpStatus.OK);
+        Optional<User> user = authservice.authenticate(userAuthDto);
+
+        if (user.isPresent()) {
+            token = jwtUtil.generateToken(user);
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("token", token);
+        data.put("user", user);
+        return ResponseEntity.ok(responseUtil.createResponse(data, HttpStatus.OK));
     }
 
     @PostMapping("/register")
@@ -42,7 +64,7 @@ public class AuthController {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception ex) {
+    public ResponseEntity<ErrorResponse<Object>> handleException(Exception ex) {
 
         System.out.println(ex.getClass());
 
@@ -61,7 +83,7 @@ public class AuthController {
                     + ex.getMessage();
         }
 
-        return ResponseEntity.status(status).body(errorMessage);
+        return ResponseEntity.ok(responseUtil.createErrorResponse(errorMessage, status));
     }
 
 }

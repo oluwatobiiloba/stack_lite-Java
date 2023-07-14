@@ -3,7 +3,9 @@ package com.stacklite.dev.stacklite_clone.Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PasswordUtils {
 
     @Value("${SALT_ROUNDS}")

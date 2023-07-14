@@ -1,17 +1,25 @@
 package com.stacklite.dev.stacklite_clone.Services;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import com.stacklite.dev.stacklite_clone.Model.User;
+import com.stacklite.dev.stacklite_clone.Model.ERole;
+import com.stacklite.dev.stacklite_clone.Model.Role;
+import com.stacklite.dev.stacklite_clone.Repositories.RolesRepo;
 import com.stacklite.dev.stacklite_clone.Repositories.UsersRepo;
 import com.stacklite.dev.stacklite_clone.Dto.UserProfileUpdateDto;
 import com.stacklite.dev.stacklite_clone.Dto.UserRegistrationDto;
@@ -21,6 +29,9 @@ import com.stacklite.dev.stacklite_clone.Handlers.NotFoundException;
 public class UserService {
     @Autowired
     private UsersRepo usersRepo;
+
+    @Autowired
+    private RolesRepo rolesRepo;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -101,6 +112,37 @@ public class UserService {
         user.setPhoneNumber(userRegDto.getPhoneNumber());
         user.setEmail(userRegDto.getEmail());
         user.setPassword(userRegDto.getPassword());
+
+        Set<String> strRoles = userRegDto.getRole();
+        List<Role> roles = new ArrayList<>();
+
+        if (strRoles == null) {
+            Role userRole = rolesRepo.findByName(ERole.ROLE_USER)
+                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            roles.add(userRole);
+        } else {
+            strRoles.forEach(role -> {
+                System.out.println(role);
+                switch (role) {
+                    case "admin":
+                        Role adminRole = rolesRepo.findByName(ERole.ROLE_ADMIN).orElseThrow(
+                                () -> new RuntimeException("Error: Role is not found."));
+                        roles.add(adminRole);
+                        break;
+                    case "mod":
+                        Role modRole = rolesRepo.findByName(ERole.ROLE_MANAGER).orElseThrow(
+                                () -> new RuntimeException("Error: Role is not found."));
+                        roles.add(modRole);
+                        break;
+                    default:
+                        Role userRole = rolesRepo.findByName(ERole.ROLE_USER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(userRole);
+                }
+            });
+        }
+
+        user.setAuthorities(roles);
 
         User createdUser = usersRepo.save(user);
 

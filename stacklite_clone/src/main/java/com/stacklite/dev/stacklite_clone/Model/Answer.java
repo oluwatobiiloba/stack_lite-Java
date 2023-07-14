@@ -58,9 +58,6 @@ public class Answer {
     @JoinColumn(name = "questionId", referencedColumnName = "id", nullable = false)
     private Question question;
 
-    // Add the necessary getters and setters
-
-    // Define relationships with Comments and Voters
     @OneToMany(mappedBy = "answer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 

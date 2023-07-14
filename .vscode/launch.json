@@ -2,6 +2,27 @@
   "configurations": [
     {
       "type": "java",
+      "name": "SecretKeyGenerator",
+      "request": "launch",
+      "mainClass": "com.stacklite.dev.stacklite_clone.Utils.SecretKeyGenerator",
+      "projectName": "stacklite_clone"
+    },
+    {
+      "type": "java",
+      "name": "JwtTokenUtil",
+      "request": "launch",
+      "mainClass": "com.stacklite.dev.stacklite_clone.Utils.JwtTokenUtil",
+      "projectName": "stacklite_clone"
+    },
+    {
+      "type": "java",
+      "name": "AzureMailer",
+      "request": "launch",
+      "mainClass": "com.stacklite.dev.stacklite_clone.Utils.AzureMailer",
+      "projectName": "stacklite_clone"
+    },
+    {
+      "type": "java",
       "name": "Spring Boot-StackliteCloneApplication<stacklite_clone>",
       "request": "launch",
       "cwd": "${workspaceFolder}",

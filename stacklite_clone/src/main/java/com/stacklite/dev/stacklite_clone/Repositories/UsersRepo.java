@@ -5,11 +5,14 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import com.stacklite.dev.stacklite_clone.Model.User;
 
+@Repository
 public interface UsersRepo extends JpaRepository<User, Integer> {
-    // Optional<User> findById(Integer id);
+    Optional<User> findById(Integer id);
+
     Optional<List<User>> findByisVerified(Boolean isVerified);
 
     Optional<List<User>> findByUsername(String username);
@@ -19,4 +22,8 @@ public interface UsersRepo extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
 
     Optional<List<User>> findByUsernameLike(String likePattern);
+
+    Boolean existsByUsername(String username);
+
+    Boolean existsByEmail(String email);
 }
