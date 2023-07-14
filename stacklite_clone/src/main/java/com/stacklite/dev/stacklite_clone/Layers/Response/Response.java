@@ -18,6 +18,7 @@ public class Response<T> {
     private LocalDateTime timestamp;
     private HttpStatus status;
     private String message;
+    private String path;
     private T data;
 
 }

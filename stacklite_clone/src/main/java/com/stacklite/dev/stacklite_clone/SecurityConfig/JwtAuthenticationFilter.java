@@ -1,8 +1,6 @@
 package com.stacklite.dev.stacklite_clone.SecurityConfig;
 
 import java.io.IOException;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.stacklite.dev.stacklite_clone.Model.User;
 import com.stacklite.dev.stacklite_clone.Services.UserDetailsServiceImpl;
-import com.stacklite.dev.stacklite_clone.Services.UserService;
 import com.stacklite.dev.stacklite_clone.Utils.JwtTokenUtil;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -30,9 +26,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
-    private UserService userService;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
@@ -70,6 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } catch (IllegalArgumentException e) {
                 throw e;
             } catch (ExpiredJwtException e) {
+                logger.info(e.getMessage());
                 throw e;
             }
             ;

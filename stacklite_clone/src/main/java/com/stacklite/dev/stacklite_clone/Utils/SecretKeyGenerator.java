@@ -1,6 +1,5 @@
 package com.stacklite.dev.stacklite_clone.Utils;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import io.jsonwebtoken.SignatureAlgorithm;

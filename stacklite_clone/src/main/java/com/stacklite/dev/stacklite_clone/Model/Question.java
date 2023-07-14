@@ -2,9 +2,6 @@ package com.stacklite.dev.stacklite_clone.Model;
 
 import java.util.List;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,9 +24,7 @@ import lombok.NoArgsConstructor;
 
 public class Question {
 
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "uuid", columnDefinition = "char(36)", nullable = false, updatable = false)
-    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "uuid", columnDefinition = "uuid", nullable = false, updatable = false)
     private String uuid;
 
     @Id
