@@ -5,6 +5,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/stacklite_clone/pom.xml" />
+        <option value="$PROJECT_DIR$/gen/pom.xml" />
       </list>
     </option>
   </component>

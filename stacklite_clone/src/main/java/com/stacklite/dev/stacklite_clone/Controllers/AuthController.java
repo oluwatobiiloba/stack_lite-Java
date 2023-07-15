@@ -35,8 +35,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Response<Object>> authenticateEmailPassword(
-            @Valid @RequestBody UserAuthDto userAuthDto)
-            throws Exception {
+            @Valid @RequestBody UserAuthDto userAuthDto){
         Optional<User> user = authservice.authenticate(userAuthDto);
 
         if (user.isPresent()) {
@@ -47,8 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Response<Object>> registerUser(@Valid @RequestBody UserRegistrationDto userRegDto)
-            throws Exception {
+    public ResponseEntity<Response<Object>> registerUser(@Valid @RequestBody UserRegistrationDto userRegDto){
         Optional<User> user = authservice.register(userRegDto);
         if (user.isPresent()) {
             token = jwtUtil.generateToken(user);
