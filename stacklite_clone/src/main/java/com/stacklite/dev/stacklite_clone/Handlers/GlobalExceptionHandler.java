@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.stacklite.dev.stacklite_clone.Layers.Response.ErrorResponse;
 import com.stacklite.dev.stacklite_clone.Utils.ResponseUtil;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ValidationException;
 

@@ -21,18 +21,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.stacklite.dev.stacklite_clone.Model.User;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.annotation.PostConstruct;
 
 @Component
@@ -49,8 +43,6 @@ public class JwtTokenUtil implements Serializable {
     private String authoritiesKey;
 
     private Key key;
-
-    private static final Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
 
     @PostConstruct
     public void init() {
@@ -118,7 +110,7 @@ public class JwtTokenUtil implements Serializable {
             Jwts.parserBuilder().setSigningKey(key).build().parse(authToken);
             return true;
         } catch (Exception e) {
-            System.out.println(e + "-----------------");
+
             throw e;
         }
     }
