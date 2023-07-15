@@ -3,6 +3,8 @@ package com.stacklite.dev.stacklite_clone.Repositories;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,15 +14,17 @@ import com.stacklite.dev.stacklite_clone.Model.User;
 public interface UsersRepo extends JpaRepository<User, Integer> {
     Optional<User> findById(Integer id);
 
-    Optional<List<User>> findByisVerified(Boolean isVerified);
+    Page<User> findByisVerified(Boolean isVerified, Pageable pageable);
 
-    Optional<List<User>> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
-    Optional<List<User>> findByStack(String stack);
+    Page<User> findByStack(String stack, Pageable pageable);
+
+    Page<User> findByAge(String age, Pageable pageable);
 
     Optional<User> findByEmail(String email);
 
-    Optional<List<User>> findByUsernameLike(String likePattern);
+    Page<User> findByUsernameLike(String likePattern, Pageable pageable);
 
     Boolean existsByUsername(String username);
 

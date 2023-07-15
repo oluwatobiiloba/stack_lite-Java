@@ -36,11 +36,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Se
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
-        // final Map<String, Object> body = new HashMap<>();
-        // body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        // body.put("error", "Unauthorized");
-        // body.put("message", authException.getMessage());
-        // body.put("path", request.getServletPath());
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         String date = dateConverter.convertToDate(currentDateTime);

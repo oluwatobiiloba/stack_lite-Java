@@ -2,14 +2,18 @@ package com.stacklite.dev.stacklite_clone.Services;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.stacklite.dev.stacklite_clone.Model.User;
@@ -17,9 +21,13 @@ import com.stacklite.dev.stacklite_clone.Model.ERole;
 import com.stacklite.dev.stacklite_clone.Model.Role;
 import com.stacklite.dev.stacklite_clone.Repositories.RolesRepo;
 import com.stacklite.dev.stacklite_clone.Repositories.UsersRepo;
+import com.stacklite.dev.stacklite_clone.Utils.Pagination;
+import com.stacklite.dev.stacklite_clone.Utils.SearchResultBuilder;
 import com.stacklite.dev.stacklite_clone.Dto.UserProfileUpdateDto;
 import com.stacklite.dev.stacklite_clone.Dto.UserRegistrationDto;
+import com.stacklite.dev.stacklite_clone.Dto.UserRespDto;
 import com.stacklite.dev.stacklite_clone.Handlers.NotFoundException;
+import com.stacklite.dev.stacklite_clone.Mapper.UserMapper;
 
 @Service
 public class UserService {
@@ -31,34 +39,64 @@ public class UserService {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    // @Value("${DB_NAME}")
-    // String dbPasword;
+    public Map<String, Object> allUsers(Map<String, String> queryParameters) {
 
-    public Optional<List<User>> allUsers(Map<String, String> queryParameters) {
-        if (queryParameters.containsKey("email")) {
-            String email = queryParameters.get("email");
-            logger.info("email is {}", email);
-            Optional<User> optionalUser = usersRepo.findByEmail(email);
-            if (optionalUser.isPresent()) {
-                List<User> userList = Collections.singletonList(optionalUser.get());
-                return Optional.of(userList);
-            } else {
-                return Optional.empty();
-            }
-        } else {
-            List<User> users = usersRepo.findAll();
-            Optional<List<User>> optionalUsers = Optional.ofNullable(users);
-            return optionalUsers;
-        }
+        Pageable pageable = Pagination.createPageable(queryParameters);
+        Page<User> usersPage = usersRepo.findAll(pageable);
+        List<UserRespDto> users = usersPage.getContent().stream()
+                .map(UserMapper::mapToUserRespDto)
+                .collect(Collectors.toList());
 
+        return SearchResultBuilder.buildResult(users, usersPage);
     }
 
-    // public List<User> findUsers(String queryString) {
+    public Map<String, Object> searchUsers(Map<String, String> queryParameters) {
+        if (queryParameters.isEmpty()) {
+            throw new NotFoundException("No search params found");
+        }
 
-    // }
+        Pageable pageable = Pagination.createPageable(queryParameters);
+        List<UserRespDto> users = null;
+        Page<User> usersPage = null;
 
-    public Optional<User> getUser(Integer Id) {
-        return usersRepo.findById(Id);
+        if (queryParameters.containsKey("email")) {
+            String email = queryParameters.get("email");
+            usersPage = searchUsersByEmail(email, pageable);
+            users = usersPage.getContent().stream()
+                    .map(UserMapper::mapToUserRespDto)
+                    .collect(Collectors.toList());
+        }
+
+        if (queryParameters.containsKey("age")) {
+            String age = queryParameters.get("age");
+            // Call a method to search users by age and populate the result map
+            usersPage = searchUsersByAge(age, pageable);
+            users = usersPage.getContent().stream()
+                    .map(UserMapper::mapToUserRespDto)
+                    .collect(Collectors.toList());
+
+        }
+
+        return SearchResultBuilder.buildResult(users, usersPage);
+    }
+
+    private Page<User> searchUsersByEmail(String email, Pageable pageable) {
+        // Implement the logic to search users by email using your repository or service
+        // methods
+        Optional<User> optionalUser = usersRepo.findByEmail(email);
+        Page<User> usersPage = Pagination.convertToPage(optionalUser, pageable);
+        return usersPage;
+    }
+
+    private Page<User> searchUsersByAge(String age, Pageable pageable) {
+        // Implement the logic to search users by age using your repository or service
+        // methods
+        Page<User> usersPage = usersRepo.findByAge(age, pageable);
+        return usersPage;
+    }
+
+    public Optional<UserRespDto> getUser(Integer Id) {
+        return usersRepo.findById(Id).map(UserMapper::mapToUserRespDto);
     }
 
     public Optional<User> getUserbyEmail(String email) {
@@ -68,7 +106,6 @@ public class UserService {
     public Optional<User> updateProfile(Integer Id, UserProfileUpdateDto userUpdateDTO) throws Exception {
         Optional<User> optionalUser = usersRepo.findById(Id);
 
-        System.out.println(optionalUser);
         if (optionalUser.isEmpty()) {
             throw new NotFoundException("User not found with ID: " + Id);
         }

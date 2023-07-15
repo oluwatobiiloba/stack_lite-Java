@@ -39,8 +39,8 @@ import jakarta.annotation.PostConstruct;
 public class JwtTokenUtil implements Serializable {
     private static final long serialVersionUID = -2550185165626007488L;
 
-    @Value("${jwt.validity:18000}")
-    private long tokenValidity;
+    @Value("${jwt.validity:300000}")
+    private Integer tokenValidity;
 
     @Value("${jwt.signing.key:D8dbDxiMDfPQ0/kB5H7bM3ww4MQ84k8zljJzZ8ihrhw=}")
     private String signingKey;
@@ -105,7 +105,7 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
-
+        System.out.println("--" + tokenValidity);
         return Jwts.builder().setSubject(subject).claim(authoritiesKey, claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + tokenValidity))
@@ -113,21 +113,14 @@ public class JwtTokenUtil implements Serializable {
     }
 
     // validate token
-    public boolean validateJwtToken(String authToken) {
+    public boolean validateJwtToken(String authToken) throws Exception {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parse(authToken);
             return true;
-        } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
+        } catch (Exception e) {
+            System.out.println(e + "-----------------");
+            throw e;
         }
-
-        return false;
     }
 
 }
