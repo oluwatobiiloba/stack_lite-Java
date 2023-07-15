@@ -19,9 +19,8 @@ import com.stacklite.dev.stacklite_clone.Repositories.RolesRepo;
 import com.stacklite.dev.stacklite_clone.Repositories.UsersRepo;
 import com.stacklite.dev.stacklite_clone.Utils.Pagination;
 import com.stacklite.dev.stacklite_clone.Utils.SearchResultBuilder;
-import com.stacklite.dev.stacklite_clone.Dto.UserProfileUpdateDto;
-import com.stacklite.dev.stacklite_clone.Dto.UserRegistrationDto;
-import com.stacklite.dev.stacklite_clone.Dto.UserRespDto;
+import com.stacklite.dev.stacklite_clone.Dto.User.*;
+
 import com.stacklite.dev.stacklite_clone.Handlers.NotFoundException;
 import com.stacklite.dev.stacklite_clone.Mapper.UserMapper;
 
@@ -149,31 +148,31 @@ public class UserService {
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
-                System.out.println(role);
+
                 switch (role) {
-                    case "admin":
+                    case "admin" -> {
                         Role adminRole = rolesRepo.findByName(ERole.ROLE_ADMIN).orElseThrow(
                                 () -> new RuntimeException("Error: Role is not found."));
                         roles.add(adminRole);
-                        break;
-                    case "mod":
+                    }
+                    case "mod" -> {
                         Role modRole = rolesRepo.findByName(ERole.ROLE_MANAGER).orElseThrow(
                                 () -> new RuntimeException("Error: Role is not found."));
                         roles.add(modRole);
-                        break;
-                    default:
+                    }
+                    default -> {
                         Role userRole = rolesRepo.findByName(ERole.ROLE_USER)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(userRole);
+                    }
                 }
             });
         }
 
         user.setAuthorities(roles);
 
-        User createdUser = usersRepo.save(user);
 
-        return Optional.of(createdUser);
+        return Optional.of(usersRepo.save(user));
     }
 
 }

@@ -19,8 +19,7 @@ import com.stacklite.dev.stacklite_clone.Layers.Response.Response;
 import com.stacklite.dev.stacklite_clone.Model.User;
 import com.stacklite.dev.stacklite_clone.Services.UserService;
 import jakarta.validation.Valid;
-import com.stacklite.dev.stacklite_clone.Dto.UserProfileUpdateDto;
-import com.stacklite.dev.stacklite_clone.Dto.UserRespDto;
+import com.stacklite.dev.stacklite_clone.Dto.User.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -34,9 +33,6 @@ public class UserController {
     @GetMapping("/allusers")
     public ResponseEntity<Response<Object>> getAllUsers(
             @RequestParam(required = false) Map<String, String> queryParameters) {
-        // return new
-        // ResponseEntity<Optional<List<UserRespDto>>>(userService.allUsers(queryParameters),
-        // HttpStatus.OK);
         Map<String, Object> users = userService.allUsers(queryParameters);
         if (users.isEmpty()) {
             throw new NotFoundException("No user(s) found");

@@ -4,14 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.stacklite.dev.stacklite_clone.Dto.User.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.stacklite.dev.stacklite_clone.Dto.UserAuthDto;
-import com.stacklite.dev.stacklite_clone.Dto.UserRegistrationDto;
 import com.stacklite.dev.stacklite_clone.Handlers.UnauthorizedException;
 import com.stacklite.dev.stacklite_clone.Model.User;
 import io.github.cdimascio.dotenv.Dotenv;

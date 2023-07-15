@@ -3,8 +3,10 @@ package com.stacklite.dev.stacklite_clone.Handlers;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.stacklite.dev.stacklite_clone.Layers.Response.ErrorResponse;
 import com.stacklite.dev.stacklite_clone.Utils.ResponseUtil;
@@ -36,13 +38,16 @@ public class GlobalExceptionHandler {
         } else if (ex instanceof UnauthorizedException) {
             status = HttpStatus.UNAUTHORIZED;
             errorMessage = ex.getMessage();
-        } else if (ex instanceof ValidationException) {
-            status = HttpStatus.BAD_REQUEST;
-            errorMessage = ex.getMessage();
         } else if (ex instanceof DataIntegrityViolationException) {
             status = HttpStatus.CONFLICT;
             errorMessage = "Contect Error: Duplicate entry violation. The provided data conflicts with existing records. /n "
                     + ex.getMessage();
+        } else if (ex instanceof MethodArgumentNotValidException) {
+            status = HttpStatus.CONFLICT;
+            errorMessage = ex.getMessage();
+        } else if (ex instanceof NoHandlerFoundException) {
+            status = HttpStatus.NOT_FOUND;
+            errorMessage = ex.getMessage();
         }
 
         ErrorResponse<Object> errorResponse = responseUtil.createErrorResponse(errorMessage, status,

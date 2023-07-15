@@ -1,4 +1,4 @@
-package com.stacklite.dev.stacklite_clone.Dto;
+package com.stacklite.dev.stacklite_clone.Dto.User;
 
 import java.util.Set;
 

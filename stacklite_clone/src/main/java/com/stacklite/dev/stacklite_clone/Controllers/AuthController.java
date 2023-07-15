@@ -1,9 +1,10 @@
 package com.stacklite.dev.stacklite_clone.Controllers;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
+import com.stacklite.dev.stacklite_clone.Dto.User.*;
+import com.stacklite.dev.stacklite_clone.Handlers.ResponseHandler;
+import com.stacklite.dev.stacklite_clone.Mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,14 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.stacklite.dev.stacklite_clone.Dto.UserAuthDto;
-import com.stacklite.dev.stacklite_clone.Dto.UserRegistrationDto;
 import com.stacklite.dev.stacklite_clone.Layers.Response.Response;
 import com.stacklite.dev.stacklite_clone.Model.User;
 import com.stacklite.dev.stacklite_clone.Services.AuthService;
 import com.stacklite.dev.stacklite_clone.Utils.JwtTokenUtil;
-import com.stacklite.dev.stacklite_clone.Utils.ResponseUtil;
-
 import jakarta.validation.Valid;
 
 @RestController
@@ -29,15 +26,15 @@ public class AuthController {
     private AuthService authservice;
 
     @Autowired
-    private ResponseUtil responseUtil;
+    private JwtTokenUtil jwtUtil;
 
     @Autowired
-    private JwtTokenUtil jwtUtil;
+    private ResponseHandler responseHandler;
 
     String token;
 
     @PostMapping("/login")
-    public ResponseEntity<Response<Map<String, Object>>> authenticateEmailPassword(
+    public ResponseEntity<Response<Object>> authenticateEmailPassword(
             @Valid @RequestBody UserAuthDto userAuthDto)
             throws Exception {
         Optional<User> user = authservice.authenticate(userAuthDto);
@@ -45,17 +42,20 @@ public class AuthController {
         if (user.isPresent()) {
             token = jwtUtil.generateToken(user);
         }
-        Map<String, Object> data = new HashMap<>();
-        data.put("token", token);
-        data.put("user", user);
-        return ResponseEntity.ok(responseUtil.createResponse(data, HttpStatus.OK, "/login"));
+        UserAuthorizationDto data = new UserAuthorizationDto(user, token);
+        return responseHandler.sendResponse(data, HttpStatus.OK, "/login");
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Response<Optional<User>>> registerUser(@Valid @RequestBody UserRegistrationDto userRegDto)
+    public ResponseEntity<Response<Object>> registerUser(@Valid @RequestBody UserRegistrationDto userRegDto)
             throws Exception {
         Optional<User> user = authservice.register(userRegDto);
-        return ResponseEntity.ok(responseUtil.createResponse(user, HttpStatus.OK, "/login"));
+        if (user.isPresent()) {
+            token = jwtUtil.generateToken(user);
+        }
+
+        UserRegRespDto data = new UserRegRespDto(user.map(UserMapper::mapToUserRespDto), token);
+        return responseHandler.sendResponse(data, HttpStatus.OK, "/register");
     }
 
 }
