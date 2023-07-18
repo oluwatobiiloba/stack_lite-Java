@@ -2,7 +2,7 @@ package com.stacklite.dev.stacklite_clone.Mapper;
 
 import java.util.stream.Collectors;
 
-import com.stacklite.dev.stacklite_clone.Dto.User.*;
+import com.stacklite.dev.stacklite_clone.dto.user.*;
 import com.stacklite.dev.stacklite_clone.Model.User;
 
 public class UserMapper {

@@ -17,11 +17,11 @@ import com.stacklite.dev.stacklite_clone.Model.ERole;
 import com.stacklite.dev.stacklite_clone.Model.Role;
 import com.stacklite.dev.stacklite_clone.Repositories.RolesRepo;
 import com.stacklite.dev.stacklite_clone.Repositories.UsersRepo;
-import com.stacklite.dev.stacklite_clone.Utils.Pagination;
-import com.stacklite.dev.stacklite_clone.Utils.SearchResultBuilder;
-import com.stacklite.dev.stacklite_clone.Dto.User.*;
+import com.stacklite.dev.stacklite_clone.utils.Pagination;
+import com.stacklite.dev.stacklite_clone.utils.SearchResultBuilder;
+import com.stacklite.dev.stacklite_clone.dto.user.*;
 
-import com.stacklite.dev.stacklite_clone.Handlers.NotFoundException;
+import com.stacklite.dev.stacklite_clone.handlers.NotFoundException;
 import com.stacklite.dev.stacklite_clone.Mapper.UserMapper;
 
 @Service

@@ -8,23 +8,32 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.stacklite.dev.stacklite_clone.Handlers.JwtAuthenticationEntryPoint;
+import com.stacklite.dev.stacklite_clone.handlers.JwtAuthenticationEntryPoint;
 import com.stacklite.dev.stacklite_clone.Services.UserDetailsServiceImpl;
 
 @Configuration
 @EnableMethodSecurity
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
-    @Autowired
     UserDetailsServiceImpl userDetailsService;
 
+    private final JwtAuthenticationEntryPoint unauthorizedHandler;
+
+    public WebSecurityConfig(JwtAuthenticationEntryPoint unauthorizedHandler) {
+        this.unauthorizedHandler = unauthorizedHandler;
+    }
+
     @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthenticationEntryPoint unauthorizedHandler) {
+        this.userDetailsService = userDetailsService;
+        this.unauthorizedHandler = unauthorizedHandler;
+    }
 
     @Bean
     public JwtAuthenticationFilter authenticationJwtTokenFilter() {
@@ -53,12 +62,15 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/error").permitAll() // Add this line to permit /error endpoint
+                        .requestMatchers("/api/v1/public/**").permitAll()
+                        .requestMatchers("/api/v1/api-docs").permitAll()
+                        .requestMatchers("/api/v1/swagger-ui/**","/v3/api-docs/swagger-config","/v3/api-docs").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());

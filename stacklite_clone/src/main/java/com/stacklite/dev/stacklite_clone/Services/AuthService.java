@@ -1,33 +1,41 @@
 package com.stacklite.dev.stacklite_clone.Services;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import com.stacklite.dev.stacklite_clone.Dto.User.*;
+import com.stacklite.dev.stacklite_clone.dto.user.UserAuthDto;
+import com.stacklite.dev.stacklite_clone.dto.user.UserRegistrationDto;
+import com.stacklite.dev.stacklite_clone.handlers.UnauthorizedException;
+import com.stacklite.dev.stacklite_clone.Model.User;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.stacklite.dev.stacklite_clone.Handlers.UnauthorizedException;
-import com.stacklite.dev.stacklite_clone.Model.User;
-import io.github.cdimascio.dotenv.Dotenv;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class AuthService {
 
-    @Autowired
     UserService userService;
 
+    private final EmailTemplateService azureMailer;
+
+    final Dotenv dotenv = Dotenv.load();
+    private final String liveBaseUrl = dotenv.get("LIVE_URL_BASE");
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    public AuthService(EmailTemplateService azureMailer) {
+        this.azureMailer = azureMailer;
+    }
+
     @Autowired
-    private EmailTemplateService azureMailer;
-
-    Dotenv dotenv = Dotenv.load();
-    private String liveBaseUrl = dotenv.get("LIVE_URL_BASE");
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    public AuthService(UserService userService, EmailTemplateService azureMailer) {
+        this.userService = userService;
+        this.azureMailer = azureMailer;
+    }
 
     public Optional<User> authenticate(UserAuthDto userAuthDto) {
         Optional<User> user;
@@ -42,11 +50,9 @@ public class AuthService {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             isValidPassword = encoder.matches(userAuthDto.getPassword(),
                     salt + password.substring(20));
-            logger.info(user.toString());
         }
 
-        if (isValidPassword && isValidEmail) {
-            logger.info(user.toString());
+        if (isValidPassword) {
             return user;
         } else {
             throw new UnauthorizedException("Invalid Email/Password");

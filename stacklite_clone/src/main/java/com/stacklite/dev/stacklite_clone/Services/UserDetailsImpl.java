@@ -1,33 +1,30 @@
 package com.stacklite.dev.stacklite_clone.Services;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.stacklite.dev.stacklite_clone.Model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.stacklite.dev.stacklite_clone.Model.User;
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 public class UserDetailsImpl implements UserDetails {
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
+    private final Integer id;
 
-    private String username;
+    private final String username;
 
-    private String email;
+    private final String email;
 
     @JsonIgnore
-    private String password;
+    private final String password;
 
-    private Collection<? extends GrantedAuthority> authorities;
-
-    public UserDetailsImpl() {
-
-    }
+    private final Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(Integer integer, String username, String email, String password,
             Collection<? extends GrantedAuthority> authorities) {
@@ -39,7 +36,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public static UserDetailsImpl build(User user) {
-        List<GrantedAuthority> authoritiesSet = user.getAuthorities().stream().collect(Collectors.toList());
+        List<GrantedAuthority> authoritiesSet = new ArrayList<>(user.getAuthorities());
 
         return new UserDetailsImpl(
                 user.getId(),
@@ -101,4 +98,6 @@ public class UserDetailsImpl implements UserDetails {
         UserDetailsImpl user = (UserDetailsImpl) o;
         return Objects.equals(id, user.id);
     }
+
+
 }

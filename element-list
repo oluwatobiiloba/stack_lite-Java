@@ -1,0 +1,17 @@
+com.stacklite.dev.stacklite_clone
+com.stacklite.dev.stacklite_clone.Controllers
+com.stacklite.dev.stacklite_clone.Dto.User
+com.stacklite.dev.stacklite_clone.Handlers
+com.stacklite.dev.stacklite_clone.Layers.Request
+com.stacklite.dev.stacklite_clone.Layers.Response
+com.stacklite.dev.stacklite_clone.Mapper
+com.stacklite.dev.stacklite_clone.Model
+com.stacklite.dev.stacklite_clone.Repositories
+com.stacklite.dev.stacklite_clone.Repository
+com.stacklite.dev.stacklite_clone.SecurityConfig
+com.stacklite.dev.stacklite_clone.Services
+com.stacklite.dev.stacklite_clone.Utils
+org.openapitools.client
+org.openapitools.client.api
+org.openapitools.client.auth
+org.openapitools.client.model

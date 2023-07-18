@@ -10,7 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.stacklite.dev.stacklite_clone.Utils.PasswordUtils;
+import com.stacklite.dev.stacklite_clone.utils.PasswordUtils;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

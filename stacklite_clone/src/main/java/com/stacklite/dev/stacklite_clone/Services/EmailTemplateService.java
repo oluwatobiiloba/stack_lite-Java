@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.stacklite.dev.stacklite_clone.Model.EmailTemplate;
 import com.stacklite.dev.stacklite_clone.Repositories.EmailTemplatesRepo;
-import com.stacklite.dev.stacklite_clone.Utils.AzureMailer;
+import com.stacklite.dev.stacklite_clone.utils.AzureMailer;
 
 @Service
 public class EmailTemplateService {

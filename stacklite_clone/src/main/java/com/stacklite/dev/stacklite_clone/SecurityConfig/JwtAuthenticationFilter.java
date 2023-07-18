@@ -1,6 +1,15 @@
 package com.stacklite.dev.stacklite_clone.SecurityConfig;
 
-import java.io.IOException;
+import com.stacklite.dev.stacklite_clone.handlers.JwtAuthenticationEntryPoint;
+import com.stacklite.dev.stacklite_clone.Services.UserDetailsServiceImpl;
+import com.stacklite.dev.stacklite_clone.utils.JwtTokenUtil;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,21 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.stacklite.dev.stacklite_clone.Handlers.JwtAuthenticationEntryPoint;
-import com.stacklite.dev.stacklite_clone.Services.UserDetailsServiceImpl;
-import com.stacklite.dev.stacklite_clone.Utils.JwtTokenUtil;
-
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.InvalidClaimException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.MissingClaimException;
-import io.jsonwebtoken.PrematureJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.SignatureException;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -39,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response, FilterChain filterChain)
+                                    @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
             throws ServletException, IOException {
         String requestPath = request.getRequestURI();
         String[] whitelistRoutes = getEnvironment().getProperty("app.security.whitelist-routes", "").split(",");
@@ -52,15 +47,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String authHeader = request.getHeader("Authorization");
-        String token = null;
-        Integer userId = null;
+        String token;
+        Integer userId;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
 
             try {
-                Boolean isVerfied = jwtService.validateJwtToken(token);
+                boolean isVerfied = jwtService.validateJwtToken(token);
                 userId = Integer.parseInt(jwtService.getUserId(token));
-                if (userId != null && isVerfied) {
+                if (isVerfied) {
                     UserDetails userDetails = userDetailsService.loadUserById(userId);
 
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
@@ -73,13 +68,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 handleAuthenticationException(request, response, e);
                 return;
             }
-            ;
         }
 
         filterChain.doFilter(request, response);
 
-        // System.out.println("----------" +
-        // SecurityContextHolder.getContext().getAuthentication());
     }
 
     private void handleAuthenticationException(HttpServletRequest request, HttpServletResponse response,
@@ -107,8 +99,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         AuthenticationException authenticationException = new AuthenticationServiceException(errorMessage, e);
 
-        System.out.println(e);
-
+        //noinspection ThrowablePrintedToSystemOut
         jwtAuthenticationEntryPoint.commence(request, response, authenticationException);
     }
 }
