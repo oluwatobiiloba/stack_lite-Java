@@ -1,44 +1,53 @@
-package com.stacklite.dev.stacklite_clone.Controllers;
+package com.stacklite.dev.stacklite_clone.controllers;
+
+import com.stacklite.dev.stacklite_clone.dto.user.UserProfileUpdateDto;
+import com.stacklite.dev.stacklite_clone.dto.user.UserRespDto;
+import com.stacklite.dev.stacklite_clone.handlers.NotFoundException;
+import com.stacklite.dev.stacklite_clone.handlers.ResponseHandler;
+import com.stacklite.dev.stacklite_clone.layers.response.Response;
+import com.stacklite.dev.stacklite_clone.Model.User;
+import com.stacklite.dev.stacklite_clone.Services.UserDetailsImpl;
+import com.stacklite.dev.stacklite_clone.Services.UserService;
+import com.stacklite.dev.stacklite_clone.utils.EntityMapper;
+import jakarta.validation.Valid;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.stacklite.dev.stacklite_clone.Handlers.NotFoundException;
-import com.stacklite.dev.stacklite_clone.Handlers.ResponseHandler;
-import com.stacklite.dev.stacklite_clone.Layers.Response.Response;
-import com.stacklite.dev.stacklite_clone.Model.User;
-import com.stacklite.dev.stacklite_clone.Services.UserService;
-import jakarta.validation.Valid;
-import com.stacklite.dev.stacklite_clone.Dto.User.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private ResponseHandler responseHandler;
+    private final ResponseHandler responseHandler;
+
+    public UserController(UserService userService, ResponseHandler responseHandler) {
+        this.userService = userService;
+        this.responseHandler = responseHandler;
+
+    }
 
     @GetMapping("/allusers")
-    public ResponseEntity<Response<Object>> getAllUsers(
+    public ResponseEntity<Response<Object>> allUsers(
             @RequestParam(required = false) Map<String, String> queryParameters) {
         Map<String, Object> users = userService.allUsers(queryParameters);
         if (users.isEmpty()) {
             throw new NotFoundException("No user(s) found");
         }
 
-        return responseHandler.sendResponse(users, HttpStatus.OK, null);
+                Map<String, Link> hateoasLink = EntityMapper.createLink(
+                "search-users",
+                this.getClass() ,
+                "search",
+                queryParameters);
+
+        return responseHandler.sendResponse(users, HttpStatus.OK, null,hateoasLink);
     }
 
     @GetMapping("/search")
@@ -48,18 +57,36 @@ public class UserController {
         if (users.isEmpty()) {
             throw new NotFoundException("No user(s) found");
         }
-        return responseHandler.sendResponse(users, HttpStatus.OK, null);
+
+
+        return responseHandler.sendResponse(users, HttpStatus.OK, null,null);
     }
 
     @GetMapping("/{Id}/profile")
-    public ResponseEntity<Optional<UserRespDto>> getUser(@PathVariable Integer Id) {
-        return new ResponseEntity<Optional<UserRespDto>>(userService.getUser(Id), HttpStatus.OK);
+    public ResponseEntity<Response<Object>> getUser(@PathVariable Integer Id) {
+        Optional<UserRespDto> user = userService.getUser(Id);
+
+        Map<String, Link> hateoasLink = EntityMapper.createLink(
+                "search-users",
+                this.getClass() ,
+                "search",
+                null);
+        return responseHandler.sendResponse(user, HttpStatus.OK, null,hateoasLink);
     }
 
-    @PutMapping("/{Id}/profile/edit")
-    public ResponseEntity<Optional<User>> updateUser(@PathVariable Integer Id,
-            @Valid @RequestBody UserProfileUpdateDto userUpdateDTO) throws Exception {
-        return new ResponseEntity<Optional<User>>(userService.updateProfile(Id, userUpdateDTO), HttpStatus.OK);
+    @PutMapping("/profile/edit")
+    public ResponseEntity<Response<Object>> updateUser(@Valid @RequestBody UserProfileUpdateDto userUpdateDTO) throws Exception {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userdetails = (UserDetailsImpl) auth.getPrincipal();
+        Optional<User> user = userService.updateProfile(userdetails.getId(), userUpdateDTO);
+
+        Map<String, Link> hateoasLink = EntityMapper.createLink(
+                "get-user",
+                this.getClass() ,
+                String.format("/%s/profile/edit",userdetails.getId()),
+                null);
+
+        return responseHandler.sendResponse(user, HttpStatus.OK, null,hateoasLink);
 
     }
 
