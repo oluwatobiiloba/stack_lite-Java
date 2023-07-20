@@ -1,36 +1,34 @@
 package com.stacklite.dev.stacklite_clone.Services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.stacklite.dev.stacklite_clone.Mapper.UserMapper;
+import com.stacklite.dev.stacklite_clone.Model.ERole;
+import com.stacklite.dev.stacklite_clone.Model.Role;
+import com.stacklite.dev.stacklite_clone.Model.User;
+import com.stacklite.dev.stacklite_clone.Repositories.RolesRepo;
+import com.stacklite.dev.stacklite_clone.Repositories.UsersRepo;
+import com.stacklite.dev.stacklite_clone.dto.user.UserProfileUpdateDto;
+import com.stacklite.dev.stacklite_clone.dto.user.UserRegistrationDto;
+import com.stacklite.dev.stacklite_clone.dto.user.UserRespDto;
+import com.stacklite.dev.stacklite_clone.handlers.NotFoundException;
+import com.stacklite.dev.stacklite_clone.utils.Pagination;
+import com.stacklite.dev.stacklite_clone.utils.SearchResultBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.stacklite.dev.stacklite_clone.Model.User;
-import com.stacklite.dev.stacklite_clone.Model.ERole;
-import com.stacklite.dev.stacklite_clone.Model.Role;
-import com.stacklite.dev.stacklite_clone.Repositories.RolesRepo;
-import com.stacklite.dev.stacklite_clone.Repositories.UsersRepo;
-import com.stacklite.dev.stacklite_clone.utils.Pagination;
-import com.stacklite.dev.stacklite_clone.utils.SearchResultBuilder;
-import com.stacklite.dev.stacklite_clone.dto.user.*;
-
-import com.stacklite.dev.stacklite_clone.handlers.NotFoundException;
-import com.stacklite.dev.stacklite_clone.Mapper.UserMapper;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    @Autowired
-    private UsersRepo usersRepo;
+    private final UsersRepo usersRepo;
 
-    @Autowired
-    private RolesRepo rolesRepo;
+    private final RolesRepo rolesRepo;
+
+    public UserService(UsersRepo usersRepo, RolesRepo rolesRepo) {
+        this.usersRepo = usersRepo;
+        this.rolesRepo = rolesRepo;
+    }
 
     public Map<String, Object> allUsers(Map<String, String> queryParameters) {
 
@@ -62,7 +60,6 @@ public class UserService {
 
         if (queryParameters.containsKey("age")) {
             String age = queryParameters.get("age");
-            // Call a method to search users by age and populate the result map
             usersPage = searchUsersByAge(age, pageable);
             users = usersPage.getContent().stream()
                     .map(UserMapper::mapToUserRespDto)
@@ -77,15 +74,13 @@ public class UserService {
         // Implement the logic to search users by email using your repository or service
         // methods
         Optional<User> optionalUser = usersRepo.findByEmail(email);
-        Page<User> usersPage = Pagination.convertToPage(optionalUser, pageable);
-        return usersPage;
+        return Pagination.convertToPage(optionalUser, pageable);
     }
 
     private Page<User> searchUsersByAge(String age, Pageable pageable) {
         // Implement the logic to search users by age using your repository or service
         // methods
-        Page<User> usersPage = usersRepo.findByAge(age, pageable);
-        return usersPage;
+        return usersRepo.findByAge(age, pageable);
     }
 
     public Optional<UserRespDto> getUser(Integer Id) {
@@ -96,7 +91,7 @@ public class UserService {
         return usersRepo.findByEmail(email);
     }
 
-    public Optional<User> updateProfile(Integer Id, UserProfileUpdateDto userUpdateDTO) throws Exception {
+    public Optional<User> updateProfile(Integer Id, UserProfileUpdateDto userUpdateDTO) {
         Optional<User> optionalUser = usersRepo.findById(Id);
 
         if (optionalUser.isEmpty()) {
@@ -147,8 +142,7 @@ public class UserService {
                     .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(userRole);
         } else {
-            strRoles.forEach(role -> {
-
+            for (String role : strRoles) {
                 switch (role) {
                     case "admin" -> {
                         Role adminRole = rolesRepo.findByName(ERole.ROLE_ADMIN).orElseThrow(
@@ -166,13 +160,19 @@ public class UserService {
                         roles.add(userRole);
                     }
                 }
-            });
+            }
         }
 
         user.setAuthorities(roles);
 
-
         return Optional.of(usersRepo.save(user));
     }
 
+    public Boolean checkEmailAvailability(String email) {
+        return usersRepo.existsByEmail(email);
+    }
+
+    public Boolean checkUsernameAvailability(String username) {
+        return usersRepo.existsByUsername(username);
+    }
 }
