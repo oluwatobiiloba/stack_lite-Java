@@ -11,11 +11,13 @@ import com.stacklite.dev.stacklite_clone.dto.user.UserRegistrationDto;
 import com.stacklite.dev.stacklite_clone.dto.user.UserRespDto;
 import com.stacklite.dev.stacklite_clone.handlers.NotFoundException;
 import com.stacklite.dev.stacklite_clone.utils.Pagination;
+import com.stacklite.dev.stacklite_clone.utils.PasswordUtils;
 import com.stacklite.dev.stacklite_clone.utils.SearchResultBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -175,4 +177,38 @@ public class UserService {
     public Boolean checkUsernameAvailability(String username) {
         return usersRepo.existsByUsername(username);
     }
+
+    public void  updateResetToken(String token, Optional<User> userObject){
+
+        User user = userObject.get();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new java.util.Date());
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
+
+        Timestamp expiryDate = new Timestamp(calendar.getTimeInMillis());//expires after an hour
+
+        user.setPasswordResetToken(token);
+        user.setPasswordResetTokenExpiresAt( expiryDate);
+
+        usersRepo.save(user);
+
+    }
+
+    public Optional<User> getUserByResetToken(String token){
+        Optional<User> user = usersRepo.findByPasswordResetToken(token);
+        if(user.isEmpty() || user.get().tokenHasExpired()){
+            throw new NotFoundException("Invalid/Expired Token");
+        }
+        return  user;
+    }
+
+    public  void updatePassword(String password, User user){
+            String hashedPassword = PasswordUtils.hashPassword(password);
+            user.setPassword(hashedPassword);
+            user.setPasswordResetToken(null);
+            user.setPasswordResetTokenExpiresAt(null);
+            usersRepo.save(user);
+    }
+
 }

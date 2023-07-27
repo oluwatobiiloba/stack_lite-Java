@@ -1,5 +1,6 @@
 package com.stacklite.dev.stacklite_clone.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stacklite.dev.stacklite_clone.layers.response.ErrorResponse;
 import com.stacklite.dev.stacklite_clone.layers.response.Response;
 import org.springframework.http.HttpStatus;
@@ -9,13 +10,20 @@ import java.time.LocalDateTime;
 
 @Component
 public class ResponseUtil {
-    public <T> Response<T> createResponse(T data, HttpStatus status, String path, T extraArgs) {
+
+    private final ObjectMapper objectMapper;
+
+    public ResponseUtil(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+    public <T> Response<T> createResponse(T data, HttpStatus status, String path, T extraArgs, String message) {
         Response<T> response = new Response<>();
         response.setTimestamp(LocalDateTime.now());
         response.setStatus(status);
         response.setData(data);
         response.setPath(path);
         response.setExtraArgs(extraArgs);
+        response.setMessage(message);
         return response;
     }
 
@@ -38,9 +46,13 @@ public class ResponseUtil {
         errorResponse.setPath(path);
         return errorResponse;
     }
+
+    public String toJson(Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (Exception e) {
+            // Handle the exception, maybe log an error
+            return "Server Error"; // or return a default error JSON
+        }
+    }
 }
-// final Map<String, Object> body = new HashMap<>();
-// body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-// body.put("error", "Unauthorized");
-// body.put("message", authException.getMessage());
-// body.put("path", request.getServletPath());

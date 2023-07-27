@@ -1,9 +1,11 @@
 package com.stacklite.dev.stacklite_clone.Services;
 
+import com.stacklite.dev.stacklite_clone.Model.User;
+import com.stacklite.dev.stacklite_clone.dto.user.ResetPasswordDto;
 import com.stacklite.dev.stacklite_clone.dto.user.UserAuthDto;
 import com.stacklite.dev.stacklite_clone.dto.user.UserRegistrationDto;
+import com.stacklite.dev.stacklite_clone.handlers.NotFoundException;
 import com.stacklite.dev.stacklite_clone.handlers.UnauthorizedException;
-import com.stacklite.dev.stacklite_clone.Model.User;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -24,6 +27,7 @@ public class AuthService {
 
     final Dotenv dotenv = Dotenv.load();
     private final String liveBaseUrl = dotenv.get("LIVE_URL_BASE");
+
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -76,5 +80,36 @@ public class AuthService {
             azureMailer.sendEmailWithTemplate(1, constants, email, subject);
         }
         return createdUser;
+    }
+
+
+
+    public void forgetPassword(String email){
+        Optional<User> user = userService.getUserbyEmail(email);
+        if(user.isEmpty()){
+            throw new NotFoundException("User Not found");
+        }
+
+        HashMap<String, String> constants = new HashMap<>();
+        String token = UUID.randomUUID().toString();
+        userService.updateResetToken(token,user);
+        String username = user.get().getUsername();
+        String subject = "Password Reset";
+        String resetLink = String.format("%s/api/v1/auth/password/reset?token=%s",liveBaseUrl,token);
+        constants.put("username", username);
+        constants.put("reset_link", resetLink);
+
+        azureMailer.sendEmailWithTemplate(2,constants,email,subject);
+    }
+
+    public void resetPassword( ResetPasswordDto resetPasswordDto){
+        String password = resetPasswordDto.getPassword();
+        String token = resetPasswordDto.getToken();
+
+        Optional<User> user = userService.getUserByResetToken(token);
+
+        if(user.isEmpty()) throw new NotFoundException("Invalid/Expired Token");
+
+        userService.updatePassword(password,user.get());
     }
 }

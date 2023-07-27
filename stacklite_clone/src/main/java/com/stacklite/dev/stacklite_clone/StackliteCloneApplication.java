@@ -10,7 +10,6 @@ public class StackliteCloneApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(StackliteCloneApplication.class, args);
-
 	}
 
 }

@@ -1,22 +1,23 @@
 package com.stacklite.dev.stacklite_clone.controllers;
 
+import com.stacklite.dev.stacklite_clone.Model.User;
+import com.stacklite.dev.stacklite_clone.Services.UserDetailsImpl;
+import com.stacklite.dev.stacklite_clone.Services.UserService;
 import com.stacklite.dev.stacklite_clone.dto.user.UserProfileUpdateDto;
 import com.stacklite.dev.stacklite_clone.dto.user.UserRespDto;
 import com.stacklite.dev.stacklite_clone.handlers.NotFoundException;
 import com.stacklite.dev.stacklite_clone.handlers.ResponseHandler;
-import com.stacklite.dev.stacklite_clone.layers.response.Response;
-import com.stacklite.dev.stacklite_clone.Model.User;
-import com.stacklite.dev.stacklite_clone.Services.UserDetailsImpl;
-import com.stacklite.dev.stacklite_clone.Services.UserService;
 import com.stacklite.dev.stacklite_clone.utils.EntityMapper;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -33,8 +34,9 @@ public class UserController {
 
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/allusers")
-    public ResponseEntity<Response<Object>> allUsers(
+    public ResponseEntity<String> allUsers(
             @RequestParam(required = false) Map<String, String> queryParameters) {
         Map<String, Object> users = userService.allUsers(queryParameters);
         if (users.isEmpty()) {
@@ -47,11 +49,12 @@ public class UserController {
                 "search",
                 queryParameters);
 
-        return responseHandler.sendResponse(users, HttpStatus.OK, null,hateoasLink);
+        return responseHandler.sendResponse(users, HttpStatus.OK, null,hateoasLink,null);
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/search")
-    public ResponseEntity<Response<Object>> searchUsers(
+    public ResponseEntity<String> searchUsers(
             @RequestParam(required = false) Map<String, String> queryParameters) {
         Map<String, Object> users = userService.searchUsers(queryParameters);
         if (users.isEmpty()) {
@@ -59,11 +62,12 @@ public class UserController {
         }
 
 
-        return responseHandler.sendResponse(users, HttpStatus.OK, null,null);
+        return responseHandler.sendResponse(users, HttpStatus.OK, null,null,null);
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{Id}/profile")
-    public ResponseEntity<Response<Object>> getUser(@PathVariable Integer Id) {
+    public ResponseEntity<String> getUser(@PathVariable Integer Id) {
         Optional<UserRespDto> user = userService.getUser(Id);
 
         Map<String, Link> hateoasLink = EntityMapper.createLink(
@@ -71,11 +75,31 @@ public class UserController {
                 this.getClass() ,
                 "search",
                 null);
-        return responseHandler.sendResponse(user, HttpStatus.OK, null,hateoasLink);
+        return responseHandler.sendResponse(user, HttpStatus.OK, null,hateoasLink ,null);
+    }
+
+    @Secured("IS_AUTHENTICATED_ANONYMOUSLY")
+    @GetMapping("/checkEmailAvailability/{email}")
+    public ResponseEntity<String> checkUserEmailAvailability(@PathVariable String email){
+        HashMap<String, Boolean> emailExistsObj = new HashMap<>();
+       Boolean emailExists;
+       emailExists =  userService.checkEmailAvailability(email);
+       emailExistsObj.put("emailExists",emailExists);
+       return responseHandler.sendResponse(emailExistsObj,HttpStatus.OK,  String.format("/checkEmailAvailability/%s",email),null,null);
+    }
+
+    @Secured("IS_AUTHENTICATED_ANONYMOUSLY")
+    @GetMapping("/checkUsername/{username}")
+    public ResponseEntity<String> checkUsernameAvailability(@PathVariable String username){
+        HashMap<String, Boolean> usernameExistsObj = new HashMap<>();
+        Boolean usernameExists;
+        usernameExists = userService.checkUsernameAvailability(username);
+        usernameExistsObj.put("usernameExists",usernameExists);
+        return responseHandler.sendResponse(usernameExistsObj,HttpStatus.OK,  String.format("/checkUsername/%s",username),null,null);
     }
 
     @PutMapping("/profile/edit")
-    public ResponseEntity<Response<Object>> updateUser(@Valid @RequestBody UserProfileUpdateDto userUpdateDTO) throws Exception {
+    public ResponseEntity<String> updateUser(@Valid @RequestBody UserProfileUpdateDto userUpdateDTO) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userdetails = (UserDetailsImpl) auth.getPrincipal();
         Optional<User> user = userService.updateProfile(userdetails.getId(), userUpdateDTO);
@@ -86,7 +110,7 @@ public class UserController {
                 String.format("/%s/profile/edit",userdetails.getId()),
                 null);
 
-        return responseHandler.sendResponse(user, HttpStatus.OK, null,hateoasLink);
+        return responseHandler.sendResponse(user, HttpStatus.OK, null,hateoasLink,null);
 
     }
 

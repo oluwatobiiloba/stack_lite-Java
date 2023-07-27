@@ -1,21 +1,20 @@
 package com.stacklite.dev.stacklite_clone.Model;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.stacklite.dev.stacklite_clone.utils.PasswordUtils;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -23,6 +22,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -54,6 +54,10 @@ public class User {
     @Column(name = "passwordResetToken")
     private String passwordResetToken;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(name = "passwordResetTokenExpiresAt")
+    private Timestamp passwordResetTokenExpiresAt;
+
     @Column(name = "is_verified", nullable = false)
     private Boolean isVerified;
 
@@ -73,10 +77,10 @@ public class User {
     private String nationality;
 
     @Column(name = "createdAt")
-    private Date createdAt;
+    private Timestamp createdAt;
 
     @Column(name = "updatedAt")
-    private Date updatedAt;
+    private Timestamp updatedAt;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -94,10 +98,15 @@ public class User {
     @PrePersist
     protected void onCreate() {
         this.uuid = java.util.UUID.randomUUID().toString();
-        this.createdAt = new Date(java.lang.System.currentTimeMillis());
-        this.updatedAt = new Date(java.lang.System.currentTimeMillis());
+        this.createdAt = new Timestamp(System.currentTimeMillis());
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
         this.isVerified = false;
         this.password = PasswordUtils.hashPassword(this.password);
+    }
+
+    public boolean tokenHasExpired() {
+        Date currentDate = new Date(java.lang.System.currentTimeMillis());
+        return passwordResetTokenExpiresAt != null && currentDate.after(passwordResetTokenExpiresAt);
     }
 
 }

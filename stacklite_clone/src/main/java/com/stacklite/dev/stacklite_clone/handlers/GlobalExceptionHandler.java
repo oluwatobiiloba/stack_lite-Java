@@ -1,5 +1,8 @@
 package com.stacklite.dev.stacklite_clone.handlers;
 
+import com.stacklite.dev.stacklite_clone.utils.ResponseUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ValidationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,12 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.stacklite.dev.stacklite_clone.layers.response.ErrorResponse;
-import com.stacklite.dev.stacklite_clone.utils.ResponseUtil;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ValidationException;
-
 import java.util.Objects;
 
 @RestControllerAdvice
@@ -22,15 +19,20 @@ public class GlobalExceptionHandler {
 
     private final ResponseUtil responseUtil;
 
-    public GlobalExceptionHandler(ResponseUtil responseUtil) {
+    private final ResponseHandler responseHandler;
+
+    public GlobalExceptionHandler(ResponseUtil responseUtil, ResponseHandler responseHandler) {
         this.responseUtil = responseUtil;
+        this.responseHandler = responseHandler;
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse<Object>> handleException(HttpServletRequest request, Exception ex) {
+    public ResponseEntity<String> handleException(HttpServletRequest request, Exception ex) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         String errorMessage = "Internal server error";
         String requestPath = request.getRequestURI();
+
+        System.out.println(ex.toString());
 
         if (ex instanceof NotFoundException) {
             status = HttpStatus.NOT_FOUND;
@@ -54,9 +56,7 @@ public class GlobalExceptionHandler {
             status = HttpStatus.NOT_FOUND;
             errorMessage = ex.getMessage();
         }
+        return  responseHandler.sendErrorResponse(null,status,requestPath,null,errorMessage);
 
-        ErrorResponse<Object> errorResponse = responseUtil.createErrorResponse(errorMessage, status,
-                requestPath);
-        return ResponseEntity.status(status).body(errorResponse);
     }
 }
