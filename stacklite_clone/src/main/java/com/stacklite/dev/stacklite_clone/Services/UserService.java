@@ -10,13 +10,18 @@ import com.stacklite.dev.stacklite_clone.dto.user.UserProfileUpdateDto;
 import com.stacklite.dev.stacklite_clone.dto.user.UserRegistrationDto;
 import com.stacklite.dev.stacklite_clone.dto.user.UserRespDto;
 import com.stacklite.dev.stacklite_clone.handlers.NotFoundException;
+import com.stacklite.dev.stacklite_clone.utils.BlobUploader;
 import com.stacklite.dev.stacklite_clone.utils.Pagination;
 import com.stacklite.dev.stacklite_clone.utils.PasswordUtils;
 import com.stacklite.dev.stacklite_clone.utils.SearchResultBuilder;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,9 +32,12 @@ public class UserService {
 
     private final RolesRepo rolesRepo;
 
-    public UserService(UsersRepo usersRepo, RolesRepo rolesRepo) {
+    private final BlobUploader blobUploader;
+
+    public UserService(UsersRepo usersRepo, RolesRepo rolesRepo, BlobUploader blobUploader) {
         this.usersRepo = usersRepo;
         this.rolesRepo = rolesRepo;
+        this.blobUploader = blobUploader;
     }
 
     public Map<String, Object> allUsers(Map<String, String> queryParameters) {
@@ -69,6 +77,7 @@ public class UserService {
 
         }
 
+        assert usersPage != null;
         return SearchResultBuilder.buildResult(users, usersPage);
     }
 
@@ -178,9 +187,9 @@ public class UserService {
         return usersRepo.existsByUsername(username);
     }
 
-    public void  updateResetToken(String token, Optional<User> userObject){
+    public void  updateResetToken(String token, Optional<User> userOptional){
 
-        User user = userObject.get();
+        User user = userOptional.orElse(null);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new java.util.Date());
@@ -188,6 +197,7 @@ public class UserService {
 
         Timestamp expiryDate = new Timestamp(calendar.getTimeInMillis());//expires after an hour
 
+        assert user != null;
         user.setPasswordResetToken(token);
         user.setPasswordResetTokenExpiresAt( expiryDate);
 
@@ -211,4 +221,27 @@ public class UserService {
             usersRepo.save(user);
     }
 
+    public Optional<User> uploadProfileImage(@NotBlank MultipartFile image, Integer id, String userName) throws IOException {
+        InputStream data = image.getInputStream();
+        String extension = Optional.ofNullable(image.getContentType())
+                .filter(m -> m.matches("^image/(png|jpeg|jpg)$"))
+                .map(m -> "." + m.substring(m.lastIndexOf('/') + 1 ).toLowerCase())
+                .orElse( "");
+        String fileName = userName + "_profile_image";
+
+        if (extension.isBlank()) throw new IllegalArgumentException("Invalid file, ensure you are uploading an image");
+
+       String imageUrl = blobUploader.uploadBlob("image",data,image.getSize(),fileName,extension);
+
+       Optional<User> optionalUser = usersRepo.findById(id);
+       if(optionalUser.isPresent()){
+           User user = optionalUser.get();
+           user.setProfileImage(imageUrl);
+           usersRepo.save(user);
+           return Optional.of(user);
+       }else {
+           throw new NotFoundException("User Not Found/Deleted");
+       }
+
+    }
 }

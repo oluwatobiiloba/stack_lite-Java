@@ -23,7 +23,7 @@ public class AzureMailer implements DisposableBean {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    public String getConnectionString() {
+    private String getConnectionString() {
         return comServiceConnectionString;
     }
 
@@ -46,7 +46,6 @@ public class AzureMailer implements DisposableBean {
         SyncPoller<EmailSendResult, EmailSendResult> poller = emailClient.beginSend(message);
         PollResponse<EmailSendResult> response = poller.waitForCompletion();
 
-        System.out.println("Operation Id: " + response.getValue().getId());
         logger.info("Operation Id: " + response.getValue().getId());
     }
 

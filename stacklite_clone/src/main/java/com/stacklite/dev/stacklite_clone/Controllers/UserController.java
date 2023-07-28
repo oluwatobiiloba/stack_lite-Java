@@ -3,10 +3,12 @@ package com.stacklite.dev.stacklite_clone.controllers;
 import com.stacklite.dev.stacklite_clone.Model.User;
 import com.stacklite.dev.stacklite_clone.Services.UserDetailsImpl;
 import com.stacklite.dev.stacklite_clone.Services.UserService;
+import com.stacklite.dev.stacklite_clone.dto.user.UserAuthorizationDto;
 import com.stacklite.dev.stacklite_clone.dto.user.UserProfileUpdateDto;
 import com.stacklite.dev.stacklite_clone.dto.user.UserRespDto;
 import com.stacklite.dev.stacklite_clone.handlers.NotFoundException;
 import com.stacklite.dev.stacklite_clone.handlers.ResponseHandler;
+import com.stacklite.dev.stacklite_clone.utils.BlobUploader;
 import com.stacklite.dev.stacklite_clone.utils.EntityMapper;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.Link;
@@ -16,7 +18,9 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -28,10 +32,11 @@ public class UserController {
 
     private final ResponseHandler responseHandler;
 
-    public UserController(UserService userService, ResponseHandler responseHandler) {
+
+
+    public UserController(UserService userService, ResponseHandler responseHandler, BlobUploader blobUploader) {
         this.userService = userService;
         this.responseHandler = responseHandler;
-
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
@@ -112,6 +117,16 @@ public class UserController {
 
         return responseHandler.sendResponse(user, HttpStatus.OK, null,hateoasLink,null);
 
+    }
+
+    @PostMapping("/upload-image")
+    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile multipartFile ) throws IOException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userdetails = (UserDetailsImpl) auth.getPrincipal();
+
+        Optional<User> user = userService.uploadProfileImage(multipartFile,userdetails.getId(),userdetails.getUsername());
+        UserAuthorizationDto data = new UserAuthorizationDto(user, null);
+        return responseHandler.sendResponse(data, HttpStatus.CREATED, null,null,"uploaded Successfully");
     }
 
 }

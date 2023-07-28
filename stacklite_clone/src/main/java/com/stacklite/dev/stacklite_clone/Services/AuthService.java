@@ -31,10 +31,6 @@ public class AuthService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public AuthService(EmailTemplateService azureMailer) {
-        this.azureMailer = azureMailer;
-    }
-
     @Autowired
     public AuthService(UserService userService, EmailTemplateService azureMailer) {
         this.userService = userService;

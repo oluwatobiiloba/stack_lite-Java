@@ -37,6 +37,9 @@ public class GlobalExceptionHandler {
         if (ex instanceof NotFoundException) {
             status = HttpStatus.NOT_FOUND;
             errorMessage = ex.getMessage();
+        }  else if (ex instanceof  IllegalArgumentException) {
+            status = HttpStatus.BAD_REQUEST;
+            errorMessage = ex.getMessage();
         } else if (ex instanceof ValidationException) {
             status = HttpStatus.BAD_REQUEST;
             errorMessage = ex.getMessage();
