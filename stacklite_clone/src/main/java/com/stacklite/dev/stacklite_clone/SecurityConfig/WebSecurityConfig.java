@@ -1,5 +1,7 @@
 package com.stacklite.dev.stacklite_clone.SecurityConfig;
 
+import com.stacklite.dev.stacklite_clone.Services.UserDetailsServiceImpl;
+import com.stacklite.dev.stacklite_clone.handlers.JwtAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import com.stacklite.dev.stacklite_clone.handlers.JwtAuthenticationEntryPoint;
-import com.stacklite.dev.stacklite_clone.Services.UserDetailsServiceImpl;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableMethodSecurity
@@ -33,6 +34,19 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthenticationEntryPoint unauthorizedHandler) {
         this.userDetailsService = userDetailsService;
         this.unauthorizedHandler = unauthorizedHandler;
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfig(){
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedMethods("*")
+                        .allowedOrigins("http://localhost:3000");
+                WebMvcConfigurer.super.addCorsMappings(registry);
+            }
+        };
     }
 
     @Bean

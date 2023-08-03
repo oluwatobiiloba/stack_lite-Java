@@ -8,7 +8,6 @@ import com.stacklite.dev.stacklite_clone.dto.user.UserProfileUpdateDto;
 import com.stacklite.dev.stacklite_clone.dto.user.UserRespDto;
 import com.stacklite.dev.stacklite_clone.handlers.NotFoundException;
 import com.stacklite.dev.stacklite_clone.handlers.ResponseHandler;
-import com.stacklite.dev.stacklite_clone.utils.BlobUploader;
 import com.stacklite.dev.stacklite_clone.utils.EntityMapper;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.Link;
@@ -32,9 +31,7 @@ public class UserController {
 
     private final ResponseHandler responseHandler;
 
-
-
-    public UserController(UserService userService, ResponseHandler responseHandler, BlobUploader blobUploader) {
+    public UserController(UserService userService, ResponseHandler responseHandler) {
         this.userService = userService;
         this.responseHandler = responseHandler;
     }
@@ -104,7 +101,7 @@ public class UserController {
     }
 
     @PutMapping("/profile/edit")
-    public ResponseEntity<String> updateUser(@Valid @RequestBody UserProfileUpdateDto userUpdateDTO) throws Exception {
+    public ResponseEntity<String> updateUser(@Valid @RequestBody UserProfileUpdateDto userUpdateDTO) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userdetails = (UserDetailsImpl) auth.getPrincipal();
         Optional<User> user = userService.updateProfile(userdetails.getId(), userUpdateDTO);
@@ -119,7 +116,8 @@ public class UserController {
 
     }
 
-    @PostMapping("/upload-image")
+    @Secured({"ROLE_USER"})
+    @PostMapping("/upload-profile-image")
     public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile multipartFile ) throws IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userdetails = (UserDetailsImpl) auth.getPrincipal();
