@@ -2,6 +2,7 @@ package com.stacklite.dev.stacklite_clone.SecurityConfig;
 
 import com.stacklite.dev.stacklite_clone.Services.UserDetailsServiceImpl;
 import com.stacklite.dev.stacklite_clone.handlers.JwtAuthenticationEntryPoint;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +41,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     public WebMvcConfigurer corsConfig(){
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(CorsRegistry registry) {
+            public void addCorsMappings(@NotNull CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedMethods("*")
                         .allowedOrigins("http://localhost:3000");
