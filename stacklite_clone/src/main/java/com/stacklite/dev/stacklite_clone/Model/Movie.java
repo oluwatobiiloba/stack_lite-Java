@@ -1,19 +1,20 @@
 package com.stacklite.dev.stacklite_clone.Model;
 
-import java.util.List;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Document(collection = "movies")
 @Data
 @AllArgsConstructor
+@Builder
 @NoArgsConstructor
 public class Movie {
     @Id
