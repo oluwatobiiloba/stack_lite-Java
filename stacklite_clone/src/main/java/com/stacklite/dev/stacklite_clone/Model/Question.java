@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Table(name = "questions")
@@ -36,8 +37,15 @@ public class Question {
     @OneToMany(mappedBy = "question")
     private List<Answer> answers;
 
+    private Timestamp createdAt;
+
+    private Timestamp updatedAt;
+
     @PrePersist
     protected void onCreate() {
+        this.createdAt = new Timestamp(System.currentTimeMillis());
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
         this.uuid = java.util.UUID.randomUUID().toString();
     }
+
 }

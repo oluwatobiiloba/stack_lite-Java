@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Table(name = "answers")
@@ -23,7 +24,7 @@ public class Answer {
     private Integer id;
 
     @Lob
-    @Column(name = "answers", nullable = false)
+    @Column(name = "answer", nullable = false)
     private String answer;
 
     @Column(name = "downvotes", columnDefinition = "DEFAULT 0")
@@ -49,8 +50,14 @@ public class Answer {
     @OneToMany(mappedBy = "answer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Voter> voters;
 
+    private Timestamp updatedAt;
+
+    private Timestamp createdAt;
+
     @PrePersist
     protected void onCreate() {
+        this.createdAt = new Timestamp(System.currentTimeMillis());
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
         this.uuid = java.util.UUID.randomUUID().toString();
     }
 }
