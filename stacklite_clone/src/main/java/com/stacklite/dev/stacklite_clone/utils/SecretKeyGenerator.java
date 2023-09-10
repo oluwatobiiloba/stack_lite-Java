@@ -1,10 +1,9 @@
 package com.stacklite.dev.stacklite_clone.utils;
 
-import javax.crypto.SecretKey;
-
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
+import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 

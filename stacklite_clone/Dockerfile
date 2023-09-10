@@ -1,4 +1,13 @@
+#
+# Build stage
+#
+FROM maven:latest AS build
+COPY src /usr/src/app/src
+COPY pom.xml /usr/src/app
+RUN mvn -f /usr/src/app/pom.xml clean package
+
 FROM ubuntu:latest
+LABEL authors="oluwatobilobaaremu"
 RUN \
 # Update
 apt-get update -y && \

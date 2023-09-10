@@ -1,13 +1,12 @@
 package com.stacklite.dev.stacklite_clone.Services;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.stacklite.dev.stacklite_clone.Model.Movie;
+import com.stacklite.dev.stacklite_clone.Repositories.MovieRepositoryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.stacklite.dev.stacklite_clone.Model.Movie;
-import com.stacklite.dev.stacklite_clone.Repositories.MovieRepositoryRepo;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MovieService {

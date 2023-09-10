@@ -1,9 +1,9 @@
 package com.stacklite.dev.stacklite_clone.dto.user;
 
 import com.stacklite.dev.stacklite_clone.Model.User;
-import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Optional;

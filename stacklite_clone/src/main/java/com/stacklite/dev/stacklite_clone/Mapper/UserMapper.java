@@ -1,9 +1,9 @@
 package com.stacklite.dev.stacklite_clone.Mapper;
 
-import java.util.stream.Collectors;
-
-import com.stacklite.dev.stacklite_clone.dto.user.*;
 import com.stacklite.dev.stacklite_clone.Model.User;
+import com.stacklite.dev.stacklite_clone.dto.user.UserRespDto;
+
+import java.util.stream.Collectors;
 
 public class UserMapper {
     public static UserRespDto mapToUserRespDto(User user) {

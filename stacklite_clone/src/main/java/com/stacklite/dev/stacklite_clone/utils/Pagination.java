@@ -1,22 +1,17 @@
 package com.stacklite.dev.stacklite_clone.utils;
 
+import com.stacklite.dev.stacklite_clone.Model.User;
+import org.springframework.data.domain.*;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
-import com.stacklite.dev.stacklite_clone.Model.User;
-
 public class Pagination {
     public static Pageable createPageable(Map<String, String> queryParameters) {
 
-        // Extract pagination and sorting parameters using the PaginationUtil class
+        // Extract pagination and sorting values using the PaginationUtil class
         Integer page = queryParameters.containsKey("page") ? Integer.parseInt(queryParameters.get("page")) : null;
         Integer pageSize = queryParameters.containsKey("pageSize") ? Integer.parseInt(queryParameters.get("pageSize"))
                 : null;
@@ -37,7 +32,7 @@ public class Pagination {
         String field = sortField != null ? sortField : defaultSortField;
         Sort.Direction direction = sortDirection != null ? sortDirection : defaultSortDirection;
 
-        // Create the Pageable object with the provided or default values
+        // Create the Pageable object with the values
         return PageRequest.of(pageNum, size, Sort.by(direction, field));
     }
 

@@ -39,12 +39,11 @@ public class UserController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/allusers")
     public ResponseEntity<String> allUsers(
-            @RequestParam(required = false) Map<String, String> queryParameters) {
+            @RequestParam(required = false) Map<String, String> queryParameters) throws NotFoundException{
         Map<String, Object> users = userService.allUsers(queryParameters);
         if (users.isEmpty()) {
             throw new NotFoundException("No user(s) found");
         }
-
                 Map<String, Link> hateoasLink = EntityMapper.createLink(
                 "search-users",
                 this.getClass() ,
@@ -57,7 +56,7 @@ public class UserController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/search")
     public ResponseEntity<String> searchUsers(
-            @RequestParam(required = false) Map<String, String> queryParameters) {
+            @RequestParam(required = true) Map<String, String> queryParameters) {
         Map<String, Object> users = userService.searchUsers(queryParameters);
         if (users.isEmpty()) {
             throw new NotFoundException("No user(s) found");

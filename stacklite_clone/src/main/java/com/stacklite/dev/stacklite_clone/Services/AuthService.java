@@ -42,7 +42,7 @@ public class AuthService {
 
         boolean isValidEmail = false;
         boolean isValidPassword = false;
-        user = userService.getUserbyEmail(userAuthDto.getEmail());
+        user = userService.getUserByEmail(userAuthDto.getEmail());
         if (user.isPresent()) {
             isValidEmail = true;
             String password = user.get().getPassword();
@@ -81,7 +81,7 @@ public class AuthService {
 
 
     public void forgetPassword(String email){
-        Optional<User> user = userService.getUserbyEmail(email);
+        Optional<User> user = userService.getUserByEmail(email);
         if(user.isEmpty()){
             throw new NotFoundException("User Not found");
         }

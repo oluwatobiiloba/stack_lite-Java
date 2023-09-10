@@ -1,19 +1,8 @@
 package com.stacklite.dev.stacklite_clone.utils;
 
-import java.io.Serializable;
-import java.security.Key;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.crypto.spec.SecretKeySpec;
-
+import com.stacklite.dev.stacklite_clone.Model.User;
+import io.jsonwebtoken.*;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,13 +10,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import com.stacklite.dev.stacklite_clone.Model.User;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.annotation.PostConstruct;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.Serializable;
+import java.security.Key;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -110,7 +98,6 @@ public class JwtTokenUtil implements Serializable {
             Jwts.parserBuilder().setSigningKey(key).build().parse(authToken);
             return true;
         } catch (Exception e) {
-
             throw e;
         }
     }

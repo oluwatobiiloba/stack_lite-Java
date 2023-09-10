@@ -51,8 +51,7 @@ public class ResponseUtil {
         try {
             return objectMapper.writeValueAsString(object);
         } catch (Exception e) {
-            // Handle the exception, maybe log an error
-            return "Server Error"; // or return a default error JSON
+            throw new RuntimeException(e.getMessage(),e);
         }
     }
 }

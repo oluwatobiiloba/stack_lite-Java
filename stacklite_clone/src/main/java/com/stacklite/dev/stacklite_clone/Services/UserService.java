@@ -60,45 +60,41 @@ public class UserService {
         List<UserRespDto> users = null;
         Page<User> usersPage = null;
 
-        if (queryParameters.containsKey("email")) {
-            String email = queryParameters.get("email");
-            usersPage = searchUsersByEmail(email, pageable);
-            users = usersPage.getContent().stream()
-                    .map(UserMapper::mapToUserRespDto)
-                    .collect(Collectors.toList());
-        }
 
-        if (queryParameters.containsKey("age")) {
-            String age = queryParameters.get("age");
-            usersPage = searchUsersByAge(age, pageable);
-            users = usersPage.getContent().stream()
-                    .map(UserMapper::mapToUserRespDto)
-                    .collect(Collectors.toList());
+        String usernameParam = queryParameters.get("username");
+        Integer phoneNumberParam = queryParameters.containsKey("phoneNumber") ? Integer.parseInt(queryParameters.get("phoneNumber")) : null;
+        Integer userIdParam = queryParameters.containsKey("userId") ? Integer.parseInt(queryParameters.get("userId")) : null;
+        String firstNameParam = queryParameters.get("firstName");
+        String lastNameParam = queryParameters.get("lastName");
+        String stackParam = queryParameters.get("stack");
+        String emailParam = queryParameters.get("email");
 
-        }
-
+        usersPage = usersRepo.findByParams(
+                usernameParam,
+                phoneNumberParam,
+                userIdParam,
+                firstNameParam,
+                lastNameParam,
+                stackParam,
+                emailParam,
+                pageable);
         assert usersPage != null;
+        users = usersPage.getContent().stream()
+                .map(UserMapper::mapToUserRespDto)
+                .collect(Collectors.toList());
         return SearchResultBuilder.buildResult(users, usersPage);
     }
 
     private Page<User> searchUsersByEmail(String email, Pageable pageable) {
-        // Implement the logic to search users by email using your repository or service
-        // methods
         Optional<User> optionalUser = usersRepo.findByEmail(email);
         return Pagination.convertToPage(optionalUser, pageable);
-    }
-
-    private Page<User> searchUsersByAge(String age, Pageable pageable) {
-        // Implement the logic to search users by age using your repository or service
-        // methods
-        return usersRepo.findByAge(age, pageable);
     }
 
     public Optional<UserRespDto> getUser(Integer Id) {
         return usersRepo.findById(Id).map(UserMapper::mapToUserRespDto);
     }
 
-    public Optional<User> getUserbyEmail(String email) {
+    public Optional<User> getUserByEmail(String email) {
         return usersRepo.findByEmail(email);
     }
 

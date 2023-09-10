@@ -1,15 +1,13 @@
 package com.stacklite.dev.stacklite_clone.Services;
 
+import com.stacklite.dev.stacklite_clone.Model.User;
+import com.stacklite.dev.stacklite_clone.Repositories.UsersRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import com.stacklite.dev.stacklite_clone.Model.User;
-import com.stacklite.dev.stacklite_clone.Repositories.UsersRepo;
-
-import jakarta.transaction.Transactional;
 
 @Configuration
 public class UserDetailsServiceImpl implements UserDetailsService {

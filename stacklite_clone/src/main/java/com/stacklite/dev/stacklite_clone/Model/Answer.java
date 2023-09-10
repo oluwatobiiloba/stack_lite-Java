@@ -1,20 +1,22 @@
 package com.stacklite.dev.stacklite_clone.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 @Table(name = "answers")
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
+@JsonIdentityInfo(generator= ObjectIdGenerators.IntSequenceGenerator.class, property="@questionId")
 public class Answer {
     @Column(name = "uuid", columnDefinition = "uuid", nullable = false, updatable = false)
     private String uuid;
@@ -41,6 +43,8 @@ public class Answer {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+//    @JsonIgnoreProperties("question")
+    @JsonBackReference
     @JoinColumn(name = "questionId", referencedColumnName = "id", nullable = false)
     private Question question;
 

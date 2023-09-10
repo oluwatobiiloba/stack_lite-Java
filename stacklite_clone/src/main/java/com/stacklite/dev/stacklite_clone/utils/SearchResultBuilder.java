@@ -15,6 +15,7 @@ public class SearchResultBuilder {
         result.put("page", itemPage.getNumber());
         result.put("pageSize", itemPage.getSize());
         result.put("totalPages", itemPage.getTotalPages());
+
         return result;
     }
 
