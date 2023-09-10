@@ -27,6 +27,7 @@ public class ResponseHandler {
         String jsonResponse = responseUtil.toJson(response);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        System.out.println(jsonResponse);
         return new ResponseEntity<>(jsonResponse, headers, status);
     }
 

@@ -49,6 +49,16 @@ public class Question {
         this.createdAt = new Timestamp(System.currentTimeMillis());
         this.updatedAt = new Timestamp(System.currentTimeMillis());
         this.uuid = java.util.UUID.randomUUID().toString();
+        this.status = 0;
     }
+
+    public void setUserId(Integer userId) {
+        if (this.user == null) {
+            this.user = new User();
+        }
+        this.user.setId(userId);
+    }
+
+
 
 }

@@ -8,7 +8,6 @@ import java.util.List;
 public record QuestionRespDto(
 
         Integer id,
-
         String uuid,
         java.util.Map<String, String> user,
         String question,
