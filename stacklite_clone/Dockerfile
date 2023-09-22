@@ -2,18 +2,22 @@
 # Build stage
 #
 FROM maven:latest AS build
-COPY src /usr/src/app/src
-COPY pom.xml /usr/src/app
-RUN mvn -f /usr/src/app/pom.xml clean package
+ENV MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+WORKDIR /stacklite_clone
+COPY ./pom.xml /stacklite_clone/pom.xml
+COPY ./src/main/java/com/stacklite/dev/stacklite_clone/StackliteCloneApplication.java /stacklite_clone/src/main/java/com/stacklite/dev/stacklite_clone/StackliteCloneApplication.java
+RUN mvn -f /stacklite_clone/pom.xml clean package
 
-FROM ubuntu:latest
+COPY . /stacklite_clone
+RUN mvn -f /stacklite_clone/pom.xml clean package
+
+
+FROM openjdk:20-ea-4-jdk
 LABEL authors="oluwatobilobaaremu"
-RUN \
-# Update
-apt-get update -y && \
-# Install Java
-apt-get install default-jre -y
-#add jar
-ADD ./target/stacklite_clone-0.0.1-SNAPSHOT.jar stacklite_clone.jar
 EXPOSE 3000
-CMD java -jar stacklite_clone.jar
+COPY --from=build /stacklite_clone/target/*.jar app.jar
+ENTRYPOINT ["sh","-c","java -jar /app.jar"]
+
+
+
+
