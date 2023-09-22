@@ -36,24 +36,24 @@ public class UserController {
         this.responseHandler = responseHandler;
     }
 
-    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+    @Secured({ "ROLE_USER", "ROLE_ADMIN" })
     @GetMapping("/allusers")
     public ResponseEntity<String> allUsers(
-            @RequestParam(required = false) Map<String, String> queryParameters) throws NotFoundException{
+            @RequestParam(required = false) Map<String, String> queryParameters) throws NotFoundException {
         Map<String, Object> users = userService.allUsers(queryParameters);
         if (users.isEmpty()) {
             throw new NotFoundException("No user(s) found");
         }
-                Map<String, Link> hateoasLink = EntityMapper.createLink(
+        Map<String, Link> hateoasLink = EntityMapper.createLink(
                 "search-users",
-                this.getClass() ,
+                this.getClass(),
                 "search",
                 queryParameters);
 
-        return responseHandler.sendResponse(users, HttpStatus.OK, null,hateoasLink,null);
+        return responseHandler.sendResponse(users, HttpStatus.FOUND, null, hateoasLink, null);
     }
 
-    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+    @Secured({ "ROLE_USER", "ROLE_ADMIN" })
     @GetMapping("/search")
     public ResponseEntity<String> searchUsers(
             @RequestParam(required = true) Map<String, String> queryParameters) {
@@ -62,41 +62,42 @@ public class UserController {
             throw new NotFoundException("No user(s) found");
         }
 
-
-        return responseHandler.sendResponse(users, HttpStatus.OK, null,null,null);
+        return responseHandler.sendResponse(users, HttpStatus.FOUND, null, null, null);
     }
 
-    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+    @Secured({ "ROLE_USER", "ROLE_ADMIN" })
     @GetMapping("/{Id}/profile")
     public ResponseEntity<String> getUser(@PathVariable Integer Id) {
         Optional<UserRespDto> user = userService.getUser(Id);
 
         Map<String, Link> hateoasLink = EntityMapper.createLink(
                 "search-users",
-                this.getClass() ,
+                this.getClass(),
                 "search",
                 null);
-        return responseHandler.sendResponse(user, HttpStatus.OK, null,hateoasLink ,null);
+        return responseHandler.sendResponse(user, HttpStatus.FOUND, null, hateoasLink, null);
     }
 
     @Secured("IS_AUTHENTICATED_ANONYMOUSLY")
     @GetMapping("/checkEmailAvailability/{email}")
-    public ResponseEntity<String> checkUserEmailAvailability(@PathVariable String email){
+    public ResponseEntity<String> checkUserEmailAvailability(@PathVariable String email) {
         HashMap<String, Boolean> emailExistsObj = new HashMap<>();
-       Boolean emailExists;
-       emailExists =  userService.checkEmailAvailability(email);
-       emailExistsObj.put("emailExists",emailExists);
-       return responseHandler.sendResponse(emailExistsObj,HttpStatus.OK,  String.format("/checkEmailAvailability/%s",email),null,null);
+        Boolean emailExists;
+        emailExists = userService.checkEmailAvailability(email);
+        emailExistsObj.put("emailExists", emailExists);
+        return responseHandler.sendResponse(emailExistsObj, HttpStatus.OK,
+                String.format("/checkEmailAvailability/%s", email), null, null);
     }
 
     @Secured("IS_AUTHENTICATED_ANONYMOUSLY")
     @GetMapping("/checkUsername/{username}")
-    public ResponseEntity<String> checkUsernameAvailability(@PathVariable String username){
+    public ResponseEntity<String> checkUsernameAvailability(@PathVariable String username) {
         HashMap<String, Boolean> usernameExistsObj = new HashMap<>();
         Boolean usernameExists;
         usernameExists = userService.checkUsernameAvailability(username);
-        usernameExistsObj.put("usernameExists",usernameExists);
-        return responseHandler.sendResponse(usernameExistsObj,HttpStatus.OK,  String.format("/checkUsername/%s",username),null,null);
+        usernameExistsObj.put("usernameExists", usernameExists);
+        return responseHandler.sendResponse(usernameExistsObj, HttpStatus.OK,
+                String.format("/checkUsername/%s", username), null, null);
     }
 
     @PutMapping("/profile/edit")
@@ -107,23 +108,24 @@ public class UserController {
 
         Map<String, Link> hateoasLink = EntityMapper.createLink(
                 "get-user",
-                this.getClass() ,
-                String.format("/%s/profile/edit",userdetails.getId()),
+                this.getClass(),
+                String.format("/%s/profile/edit", userdetails.getId()),
                 null);
 
-        return responseHandler.sendResponse(user, HttpStatus.OK, null,hateoasLink,null);
+        return responseHandler.sendResponse(user, HttpStatus.ACCEPTED, null, hateoasLink, null);
 
     }
 
-    @Secured({"ROLE_USER"})
+    @Secured({ "ROLE_USER" })
     @PostMapping("/upload-profile-image")
-    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile multipartFile ) throws IOException {
+    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile multipartFile) throws IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userdetails = (UserDetailsImpl) auth.getPrincipal();
 
-        Optional<User> user = userService.uploadProfileImage(multipartFile,userdetails.getId(),userdetails.getUsername());
+        Optional<User> user = userService.uploadProfileImage(multipartFile, userdetails.getId(),
+                userdetails.getUsername());
         UserAuthorizationDto data = new UserAuthorizationDto(user, null);
-        return responseHandler.sendResponse(data, HttpStatus.CREATED, null,null,"uploaded Successfully");
+        return responseHandler.sendResponse(data, HttpStatus.CREATED, null, null, "uploaded Successfully");
     }
 
 }

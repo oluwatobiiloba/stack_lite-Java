@@ -37,37 +37,39 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> authenticateEmailPassword(
-            @Valid @RequestBody UserAuthDto userAuthDto){
+            @Valid @RequestBody UserAuthDto userAuthDto) {
         Optional<User> user = authservice.authenticate(userAuthDto);
 
         if (user.isPresent()) {
             token = jwtUtil.generateToken(user);
         }
         UserAuthorizationDto data = new UserAuthorizationDto(user, token);
-        return responseHandler.sendResponse(data, HttpStatus.OK, "/login",null,String.format("Welcome %s",user.get().getUsername()));
+        return responseHandler.sendResponse(data, HttpStatus.OK, "/login", null,
+                String.format("Welcome %s", user.get().getUsername()));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@Valid @RequestBody UserRegistrationDto userRegDto){
+    public ResponseEntity<String> registerUser(@Valid @RequestBody UserRegistrationDto userRegDto) {
         Optional<User> user = authservice.register(userRegDto);
         if (user.isPresent()) {
             token = jwtUtil.generateToken(user);
         }
 
         UserRegRespDto data = new UserRegRespDto(user.map(UserMapper::mapToUserRespDto), token);
-        return responseHandler.sendResponse(data, HttpStatus.CREATED, "/register",null,String.format("Welcome to stacklite %s",user.get().getUsername()));
+        return responseHandler.sendResponse(data, HttpStatus.CREATED, "/register", null,
+                String.format("Welcome to stacklite %s", user.get().getUsername()));
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<String> forgetPassword(@Valid @RequestBody ForgotPasswordDto forgotPasswordDto ){
-       authservice.forgetPassword(forgotPasswordDto.getEmail());
-       return  responseHandler.sendResponse(null,HttpStatus.OK,"/reset-password",null,"Password reset email sent");
+    public ResponseEntity<String> forgetPassword(@Valid @RequestBody ForgotPasswordDto forgotPasswordDto) {
+        authservice.forgetPassword(forgotPasswordDto.getEmail());
+        return responseHandler.sendResponse(null, HttpStatus.OK, "/reset-password", null, "Password reset email sent");
     }
 
     @PostMapping("/password/reset")
-    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDto resetPasswordDto ){
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDto resetPasswordDto) {
         authservice.resetPassword(resetPasswordDto);
-        return  responseHandler.sendResponse(null,HttpStatus.OK,"/password/reset",null,"Password reset succesfully");
+        return responseHandler.sendResponse(null, HttpStatus.OK, "/password/reset", null, "Password reset succesfully");
     }
 
 }
